@@ -1,16 +1,14 @@
 import {appState} from "../state/store";
 import {Element as PolymerElement} from "@polymer/polymer/polymer-element";
 import {connectToRedux, ReduxBindable} from "./util/ReduxConnector";
-import {navigate} from '../state/actions/Actions.js';
+import {navigate, signInIfNeeded} from '../state/actions/Actions.js';
 import "../../node_modules/@polymer/app-route/app-location.js";
 import "../../node_modules/@polymer/app-route/app-route.js";
 import "../../node_modules/@polymer/iron-pages/iron-pages.js";
+import {FirebaseService} from "../services/FirebaseService";
 
 import Property from "../../node_modules/@leavittsoftware/polymer-ts/property-decorator";
 import Observe from "../../node_modules/@leavittsoftware/polymer-ts/observe-decorator";
-
-import "./pages/ChallengesPage";
-import "./pages/TakePhoto";
 
 const html = (template:any) => template.toString();
 
@@ -35,10 +33,12 @@ class MyApp extends PolymerElement implements ReduxBindable {
         `
     }
 
-    connectedCallback() {
+    async connectedCallback() {
         super.connectedCallback();
         connectToRedux(this);
-        // appState.dispatch(navigate('/test/path'));
+        
+        appState.dispatch(signInIfNeeded());
+        appState.dispatch(navigate('/test/path'));
     }
 
     stateReceiver(state:any) {

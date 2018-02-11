@@ -4,7 +4,7 @@ import {photosReducer as photo} from "./photos-reducer";
 import {navigationReducer as navigation} from "./navigation-reducer";
 
 const reducer:any = combineReducers({
-    photo,challenge,navigation
+    photo,navigation
 });
 
 export {reducer}
