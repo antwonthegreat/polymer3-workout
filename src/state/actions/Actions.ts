@@ -1,3 +1,8 @@
+/// <reference path="../../model/WorkoutType.ts" />
+/// <reference path="../../model/LiftType.ts" />
+/// <reference path="../../model/AppStateModel.ts" />
+/// <reference path="../../../node_modules/firebase/index.d.ts" />
+
 import {FirebaseService} from "../../services/FirebaseService";
 
 export enum ActionTypeKeys {
@@ -5,20 +10,22 @@ export enum ActionTypeKeys {
     SUBMIT_PHOTO = 'SUBMIT_PHOTO',
     SELECT_CHALLENGE = 'SELECT_CHALLENGE',
     NAVIGATE = 'NAVIGATE',
+    WORKOUT_TYPES_RECEIVED = 'WORKOUT_TYPES_RECEIVED',
+    LIFT_TYPES_RECEIVED = 'LIFT_TYPES_RECEIVED',
 
-
-    SIGNED_IN = 'SIGNED',
+    SIGNED_IN = 'SIGNED_IN',
     OTHER_ACTION = '__any_other_action_type__'
 }
 
-export type ActionTypes = SubmitPhotoAction|SelectPhotoAction|SelectChallengeAction|NavigateAction|SignedIn;
+export type ActionTypes = SubmitPhotoAction|SelectPhotoAction|SelectChallengeAction|NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction;
 
 export interface OtherAction {
     type: ActionTypeKeys.OTHER_ACTION;
 }
 
-export interface SignedIn {
+export interface SignedInAction {
     type:ActionTypeKeys.SIGNED_IN;
+    user:any;
 }
 
 export function signInIfNeeded() {
@@ -26,7 +33,6 @@ export function signInIfNeeded() {
         const f = new FirebaseService();
         try{
             let user = await f.signInIfNeeded();
-            console.log((user as any).uid);
             dispatch(signedIn(user));
         }catch(error){
             console.log('error:',error);
@@ -34,18 +40,66 @@ export function signInIfNeeded() {
     }
 }
 
-function signedIn(user:any) {
+function signedIn(user:any):SignedInAction {
     return {
         type:ActionTypeKeys.SIGNED_IN,
         user
     }
 }
 
+export interface workoutTypesReceivedAction {
+    type:ActionTypeKeys.WORKOUT_TYPES_RECEIVED;
+    workoutTypes:{[key:string]:WorkoutType},
+    user:firebase.User
+}
 
+export function getWorkoutTypesAsync(){
+    return async (dispatch:any,state:()=>AppStateModel) => {
+        const f = new FirebaseService();
+        let workoutTypes;
+        try{
+            workoutTypes = await f.getAsync('/workout-types');
+        }catch(error){
+            console.log('error:',error);
+        }
+        dispatch(workoutTypesReceived(workoutTypes,state().user));
+    }
+}
 
+function workoutTypesReceived(workoutTypes:{[key:string]:WorkoutType},user:firebase.User):workoutTypesReceivedAction {
+    return {
+        type:ActionTypeKeys.WORKOUT_TYPES_RECEIVED,
+        workoutTypes,
+        user
+    }
+}
 
+export interface liftTypesReceivedAction {
+    type:ActionTypeKeys.LIFT_TYPES_RECEIVED;
+    liftTypes:{[key:string]:LiftType},
+    user:firebase.User
+}
 
+export function getLiftTypesAsync(){
+    return async (dispatch:any,state:()=>AppStateModel) => {
+        const f = new FirebaseService();
+        let liftTypes;
+        try{
+            liftTypes = await f.getAsync('/lift-types');
+        }catch(error){
+            console.log('error:',error);
+        }
+        dispatch(liftTypesReceived(liftTypes,state().user));
+    }
+}
 
+function liftTypesReceived(liftTypes:{[key:string]:LiftType},user:firebase.User):liftTypesReceivedAction {
+    return {
+        type:ActionTypeKeys.LIFT_TYPES_RECEIVED,
+        liftTypes,
+        user
+    }
+}
 
 
 export interface SelectPhotoAction {

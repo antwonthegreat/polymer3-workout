@@ -37,7 +37,7 @@ const challengesReducer = (state:any = initialState, action:ActionTypes) => {
             // };
         }
         case ActionTypeKeys.NAVIGATE: {
-            const parts = action.route.split('/').filter(part=>part);
+            const parts = action.route.split('/').filter((part:string)=>part);
             if(parts[0] !== 'challenge')
                 return state;
             

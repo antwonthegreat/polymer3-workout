@@ -1,7 +1,7 @@
 import {appState} from "../state/store";
 import {Element as PolymerElement} from "@polymer/polymer/polymer-element";
 import {connectToRedux, ReduxBindable} from "./util/ReduxConnector";
-import {navigate, signInIfNeeded} from '../state/actions/Actions.js';
+import {navigate, signInIfNeeded, getWorkoutTypesAsync,getLiftTypesAsync} from '../state/actions/Actions.js';
 import "../../node_modules/@polymer/app-route/app-location.js";
 import "../../node_modules/@polymer/app-route/app-route.js";
 import "../../node_modules/@polymer/iron-pages/iron-pages.js";
@@ -39,11 +39,18 @@ class MyApp extends PolymerElement implements ReduxBindable {
         
         appState.dispatch(signInIfNeeded());
         appState.dispatch(navigate('/test/path'));
+        appState.dispatch(getWorkoutTypesAsync());
+        appState.dispatch(getLiftTypesAsync());    
     }
 
     stateReceiver(state:any) {
         if(state.navigation.route !== this.route.path){
             this.set('route.path', state.navigation.route);
+        }
+        if(state.user.uid){
+        }
+        if(Object.keys(state.liftTypes).length){
+            console.log(state.liftTypes);
         }
     }
 
