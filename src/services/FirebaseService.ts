@@ -38,7 +38,7 @@ class FirebaseService {
         }
     }
 
-    async getAsync<T>(path: string, id?: string, orderBy: string = '', last: number = 0, first: number = 0) {
+    async getAsync<T>(path: string, id?: string, orderBy: string = '', last: number = 0, first: number = 0):Promise<{[key:string]:T}> {
         let query:firebase.database.Query = firebase.database().ref(path);
         if (id) {
             query = query.orderByKey().equalTo(id);

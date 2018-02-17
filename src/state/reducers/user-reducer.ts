@@ -8,7 +8,7 @@ const initialState = Map({});
 const userReducer = (state:any, action:ActionTypes) => {
     switch (action.type) {
         case ActionTypeKeys.SIGNED_IN: {
-            return action.user
+            return {uid:action.user.uid,displayName:action.user.displayName,photoURL:action.user.photoURL};
             // return {...state, selectedPhotoId:action.id};
         }
         default:

@@ -1,5 +1,6 @@
 /// <reference path="../../model/WorkoutType.ts" />
 /// <reference path="../../model/LiftType.ts" />
+/// <reference path="../../model/WorkoutSummary.ts" />
 /// <reference path="../../model/AppStateModel.ts" />
 /// <reference path="../../../node_modules/firebase/index.d.ts" />
 
@@ -12,12 +13,13 @@ export enum ActionTypeKeys {
     NAVIGATE = 'NAVIGATE',
     WORKOUT_TYPES_RECEIVED = 'WORKOUT_TYPES_RECEIVED',
     LIFT_TYPES_RECEIVED = 'LIFT_TYPES_RECEIVED',
+    WORKOUT_SUMMARIES_RECEIVED = 'WORKOUT_SUMMARIES_RECEIVED',
 
     SIGNED_IN = 'SIGNED_IN',
     OTHER_ACTION = '__any_other_action_type__'
 }
 
-export type ActionTypes = SubmitPhotoAction|SelectPhotoAction|SelectChallengeAction|NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction;
+export type ActionTypes = SubmitPhotoAction|SelectPhotoAction|SelectChallengeAction|NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction;
 
 export interface OtherAction {
     type: ActionTypeKeys.OTHER_ACTION;
@@ -58,11 +60,12 @@ export function getWorkoutTypesAsync(){
         const f = new FirebaseService();
         let workoutTypes;
         try{
-            workoutTypes = await f.getAsync('/workout-types');
+            workoutTypes = await f.getAsync<WorkoutType>('/workout-types');
         }catch(error){
             console.log('error:',error);
         }
-        dispatch(workoutTypesReceived(workoutTypes,state().user));
+        if(workoutTypes)
+            dispatch(workoutTypesReceived(workoutTypes,state().user));
     }
 }
 
@@ -85,11 +88,12 @@ export function getLiftTypesAsync(){
         const f = new FirebaseService();
         let liftTypes;
         try{
-            liftTypes = await f.getAsync('/lift-types');
+            liftTypes = await f.getAsync<LiftType>('/lift-types');
         }catch(error){
             console.log('error:',error);
         }
-        dispatch(liftTypesReceived(liftTypes,state().user));
+        if(liftTypes)
+            dispatch(liftTypesReceived(liftTypes,state().user));
     }
 }
 
@@ -98,6 +102,33 @@ function liftTypesReceived(liftTypes:{[key:string]:LiftType},user:firebase.User)
         type:ActionTypeKeys.LIFT_TYPES_RECEIVED,
         liftTypes,
         user
+    }
+}
+
+export interface workoutSummariesReceivedAction {
+    type:ActionTypeKeys.WORKOUT_SUMMARIES_RECEIVED;
+    workoutSummaries:{[key:string]:WorkoutSummary}
+}
+
+export function getWorkoutSummariesAsync(){
+    return async (dispatch:any,state:()=>AppStateModel) => {
+        const f = new FirebaseService();
+        let items;
+        try{
+            let uid = state().user.uid;
+            items = await f.getAsync<WorkoutSummary>(`/users/${uid}/workout-summaries/`,undefined,'orderStartDate');
+        }catch(error){
+            console.log('error:',error);
+        }
+        if(items)
+            dispatch(workoutSummariesReceived(items));
+    }
+}
+
+function workoutSummariesReceived(workoutSummaries:{[key:string]:WorkoutSummary}):workoutSummariesReceivedAction {
+    return {
+        type:ActionTypeKeys.WORKOUT_SUMMARIES_RECEIVED,
+        workoutSummaries
     }
 }
 
