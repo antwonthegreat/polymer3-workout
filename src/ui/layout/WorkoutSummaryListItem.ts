@@ -20,7 +20,7 @@ class WorkoutSummaryListItem extends PolymerElement {
                 }
 
                 paper-item>* {
-                    pointer-events: none;
+                    // pointer-events: none;
                     padding-left: 8px;
                 }
 

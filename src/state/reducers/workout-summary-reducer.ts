@@ -23,6 +23,8 @@ const workoutSummaryWithLiftNamesSelector = (state:AppStateModel) => {
             return state.liftTypes[liftTypeKey].name || '';
         })
         return Object.assign({},workoutSummary,{liftTypeNames,id:key});
+    }).sort((a,b)=>{
+        return b.startDate - a.startDate; 
     });
 }
 

@@ -1,0 +1,355 @@
+import {Element as PolymerElement} from "@polymer/polymer/polymer-element";
+import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property-decorator";
+import "../../../node_modules/@polymer/iron-pages/iron-pages.js";
+import "../../../node_modules/@polymer/paper-tabs/paper-tabs.js";
+import "../../../node_modules/@polymer/paper-tabs/paper-tab.js";
+import "../../../node_modules/@polymer/paper-button/paper-button.js";
+import Observe from "../../../node_modules/@leavittsoftware/polymer-ts/observe-decorator";
+
+import "./PlateDrawing";
+import "./DumbbellDrawing";
+
+
+const html = (template:any) => template.toString();
+
+class PaperPlates extends PolymerElement {
+    @Property()
+    amount: number;
+
+    @Property()
+    barbellWeight: number = 45;
+
+    @Property()
+    isReps: boolean;
+
+    @Property()
+    plates: Array<number> = [];
+
+    @Property()
+    flippedBarbellPlates: Array<number>;
+
+    @Property()
+    barbellPlates: Array<number>;
+
+    @Property()
+    plateAmounts: Array<number> = [45, 35, 25, 10, 5, 2.5];
+
+    @Property()
+    dumbbellAmounts: Array<number> = [2.5, 5, 7.5, 10, 12, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 140, 150, 160];
+
+    @Property()
+    entryType: string = 'barbell';
+
+    @Property()
+    dumbbellSliderIndex: number;
+
+    @Property()
+    maxDumbbellIndex: number;
+
+    @Property()
+    hasChanges: boolean;
+
+    static get template() {
+        return html`
+            <style>
+            --app-primary-color: var(--paper-light-blue-400);
+            --primary-color: var(--app-primary-color);
+            --app-dark: var(--paper-grey-100);
+            --app-grey-1: var(--paper-grey-100);
+            --app-grey-2: var(--paper-grey-300);
+            --app-grey-3: var(--paper-grey-500);
+            --app-grey-4: var(--paper-grey-800);
+            --app-text-color: var(--paper-grey-700);
+            :host {
+                @apply --layout-flex-auto;
+                @apply --layout-vertical;
+            }
+
+            paper-tabs {
+                display: block;
+                overflow: initial;
+                --paper-tabs-selection-bar-color: var(--app-primary-color);
+            }
+
+            paper-tab {
+                --paper-tab-ink: var(--app-primary-color);
+                background-color: var(--app-grey-1);
+                color: var(--app-text-color);
+            }
+
+            paper-tabs[no-bar] paper-tab.iron-selected {
+                color: var(--app-primary-color);
+            }
+
+            .button-container {
+                background-color: var(--primary-color);
+                @apply --layout-vertical;
+                @apply --shadow-elevation-2dp;
+            }
+
+            .button-container-row {
+                @apply --layout-flex-auto;
+                @apply --layout-horizontal;
+            }
+
+            .button-container-row>paper-button {
+                @apply --layout-flex-auto;
+                @apply --paper-font-title;
+                color: var(--app-grey-1);
+                margin: 0;
+            }
+
+            .draw-area {
+                @apply --layout-horizontal;
+                @apply --layout-center;
+                @apply --layout-flex-4;
+                min-height: 128px;
+                margin: 16px;
+            }
+
+            .plate-draw-area {
+                @apply --layout-vertical;
+                @apply --layout-center;
+                @apply --layout-center-center;
+                min-height: 128px;
+                margin: 16px;
+            }
+
+            .dumbbell-draw-area {
+                @apply --layout-horizontal;
+                @apply --layout-center;
+                @apply --layout-center-center;
+                min-height: 128px;
+                margin: 16px;
+            }
+
+            iron-pages>div {
+                @apply --layout-vertical;
+                @apply --layout-flex-auto;
+                height: calc(100vh - 112px);
+            }
+
+            iron-pages>div.reduced-iron-page-height {
+                height: calc(100vh - 64px);
+            }
+
+            .spacer {
+                @apply --layout-flex-auto;
+                background-color: var(--app-grey-1);
+            }
+
+            .total-weight-area {
+                @apply --layout-horizontal;
+                @apply --layout-center-center;
+                @apply --layout-flex-3;
+                min-height: 128px;
+                background-color: var(--app-grey-1);
+                color: var(--app-text-color);
+            }
+
+            .total-weight-area-amount {
+                @apply --layout-self-center;
+                @apply --paper-font-display3;
+            }
+
+            .barbell-button {
+                @apply --layout-flex-2;
+            }
+
+            .barbell {
+                background-color: var(--app-grey-3);
+                min-height: 10px;
+                @apply --layout-flex;
+            }
+
+            .action {
+                @apply --layout-horizontal;
+                @apply --layout-end;
+                @apply --layout-end-justified;
+                position: fixed;
+                bottom: 8px;
+                right: 8px;
+            }
+
+            iron-pages>div {
+                @apply --layout-vertical;
+                @apply --layout-flex-auto;
+            }
+
+            paper-slider {
+                --paper-slider-knob-color: var(--app-primary-color);
+                --paper-slider-active-color: var(--app-primary-color);
+                --paper-slider-pin-color: var(--app-primary-color);
+                --paper-slider-height: 4px;
+                --paper-slider-markers-color: transparent;
+                --paper-slider-knob-start-color: var(--app-primary-color);
+                --paper-slider-knob-start-border-color: var(--app-primary-color);
+                width: 100%;
+                margin-top: 32px;
+            }
+
+            .plate-amounts {
+                @apply --layout-center-center;
+                margin: 16px auto;
+            }
+
+            .plate {
+                background-color: var(--app-grey-4);
+                color: var(--app-grey-1);
+                @apply --paper-font-caption;
+                width: 30px;
+                min-width: 0;
+                height: 80px;
+            }
+
+            .plate:nth-child(1) {
+                height: 120px;
+            }
+
+            .plate:nth-child(2) {
+                height: 100px;
+            }
+
+            .plate:nth-child(3) {
+                height: 80px;
+            }
+
+            .plate:nth-child(4) {
+                height: 60px;
+            }
+
+            .plate:nth-child(5) {
+                height: 40px;
+            }
+
+            .plate:nth-child(6) {
+                height: 30px;
+            }
+
+                .hidden {
+                    display:none:!important;
+                }
+            </style>
+            <paper-tabs no-bar attr-for-selected="name" selected="{{entryType}}">
+                <paper-tab name="barbell">Barbell</paper-tab>
+                <paper-tab name="dumbbell">Dumbbell</paper-tab>
+                <paper-tab name="manual">Manual</paper-tab>
+            </paper-tabs>
+            <iron-pages selected="[[entryType]]" attr-for-selected="name" fallback-selection="main">
+                <div name="barbell">
+                    <div class="draw-area">
+                        <dom-repeat items="[[flippedBarbellPlates]]">
+                            <plate-drawing plate="[[item]]" on-tap="removeBarbellPlate"></plate-drawing>
+                        </dom-repeat>
+                        <div class="barbell"></div>
+                        <dom-repeat items="[[barbellPlates]]">
+                            <plate-drawing plate="[[item]]" on-tap="removeBarbellPlate"></plate-drawing>
+                        </dom-repeat>
+                    </div>
+                    <div class="total-weight-area-amount">[[amount]]</div>
+                    <div class="plate-amounts">
+                        <dom-repeat items="[[plateAmounts]]">
+                            <paper-button class="plate" on-tap="addBarbellPlate">[[item]]</paper-button>
+                        </dom-repeat>
+                    </div>
+                    <div class="spacer"></div>
+                    <paper-button class="flat-button-primary" on-tap="okButton">OK</paper-button>
+                </div>
+                <div name="dumbbell">
+                    <div class="dumbbell-draw-area">
+                        <dumbbell-drawing weight="[[amount]]"></dumbbell-drawing>
+                    </div>
+                    <paper-slider snaps value="{{dumbbellSliderIndex}}" id="dumbbellSlider" immediate-value="{{dumbbellSliderIndex}}" min="0"
+                        max="[[maxDumbbellIndex]]"></paper-slider>
+                    <div class="spacer"></div>
+                    <paper-button class="flat-button-primary" on-tap="okButton">OK</paper-button>
+                </div>
+                <div name="manual" class$="[[calculateIronPageHeightClass(isReps)]]">
+                    <div class="total-weight-area">
+                        <div class="total-weight-area-amount">[[amount]]</div>
+                    </div>
+                    <div class="spacer"></div>
+                    <div class="button-container">
+                        <div class="button-container-row">
+                            <paper-button class="flat-button-primary" on-tap="addDigit" value="1">1</paper-button>
+                            <paper-button class="flat-button-primary" on-tap="addDigit" value="2">2</paper-button>
+                            <paper-button class="flat-button-primary" on-tap="addDigit" value="3">3</paper-button>
+                        </div>
+                        <div class="button-container-row">
+                            <paper-button class="flat-button-primary" on-tap="addDigit" value="4">4</paper-button>
+                            <paper-button class="flat-button-primary" on-tap="addDigit" value="5">5</paper-button>
+                            <paper-button class="flat-button-primary" on-tap="addDigit" value="6">6</paper-button>
+                        </div>
+                        <div class="button-container-row">
+                            <paper-button class="flat-button-primary" on-tap="addDigit" value="7">7</paper-button>
+                            <paper-button class="flat-button-primary" on-tap="addDigit" value="8">8</paper-button>
+                            <paper-button class="flat-button-primary" on-tap="addDigit" value="9">9</paper-button>
+                        </div>
+                        <div class="button-container-row">
+                            <paper-button class="flat-button-primary" on-tap="clear">
+                                <iron-icon icon="my-icons:backspace"></iron-icon>
+                            </paper-button>
+                            <!-- <paper-button class="flat-button-primary" on-tap="decrement">-</paper-button> -->
+                            <paper-button class="flat-button-primary" on-tap="addDigit" value="0">0</paper-button>
+                            <!-- <paper-button class="flat-button-primary" on-tap="increment">+</paper-button> -->
+                            <paper-button class="flat-button-primary" on-tap="okButton">OK</paper-button>
+                        </div>
+                        <div class="button-container-row">
+                            <!-- <paper-button class="flat-button-primary" on-tap="addDigit" value=".">.</paper-button> -->
+                        </div>
+                    </div>
+                </div>
+            </iron-pages>
+        `
+    }
+
+    @Observe('amount')
+    weightChanged(weight: number) {
+        if (weight) {
+            let dumbbellSliderIndex = this.dumbbellAmounts.indexOf(parseInt(weight.toString(), 10));
+            if (dumbbellSliderIndex > -1) {
+                this.dumbbellSliderIndex = dumbbellSliderIndex;
+            }
+            this.barbellWeight = parseInt(this.barbellWeight.toString());
+            let barbellPlates = [];
+            let plates = [];
+            let remainingBarbellWeight = weight - this.barbellWeight;
+
+            let plateAmountIndex = 0;
+            while (remainingBarbellWeight > 0 && plateAmountIndex < this.plateAmounts.length) {
+                let plateToAdd = this.plateAmounts[plateAmountIndex];
+                if (remainingBarbellWeight < plateToAdd * 2) {
+                    plateAmountIndex += 1;
+                } else {
+                    barbellPlates.push({ weight: plateToAdd });
+                    remainingBarbellWeight -= (plateToAdd * 2);
+                }
+            }
+            this.set('barbellPlates', barbellPlates);
+            this.set('flippedBarbellPlates', barbellPlates.slice().reverse());
+
+            let remainingWeight = weight;
+            plateAmountIndex = 0;
+            while (remainingWeight > 0 && plateAmountIndex < this.plateAmounts.length) {
+                let plateToAdd = this.plateAmounts[plateAmountIndex];
+                if (remainingWeight < plateToAdd) {
+                    plateAmountIndex += 1;
+                } else {
+                    plates.push({ weight: plateToAdd });
+                    remainingWeight -= plateToAdd;
+                }
+            }
+            this.set('plates', plates.reverse());
+        }
+    }
+
+    connectedCallback() {
+        super.connectedCallback();
+    }
+
+
+}
+
+customElements.define('paper-plates', PaperPlates);
+
+export {PaperPlates};

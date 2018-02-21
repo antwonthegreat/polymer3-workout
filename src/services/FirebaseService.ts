@@ -60,6 +60,10 @@ class FirebaseService {
         if (!val) {
             return {};
         }
+
+        if(id){
+            val[id].id = id;
+        }
         return val;    
     }
 

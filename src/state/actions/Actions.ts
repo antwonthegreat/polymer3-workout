@@ -1,6 +1,7 @@
 /// <reference path="../../model/WorkoutType.ts" />
 /// <reference path="../../model/LiftType.ts" />
 /// <reference path="../../model/WorkoutSummary.ts" />
+/// <reference path="../../model/Workout.ts" />
 /// <reference path="../../model/AppStateModel.ts" />
 /// <reference path="../../../node_modules/firebase/index.d.ts" />
 
@@ -14,12 +15,16 @@ export enum ActionTypeKeys {
     WORKOUT_TYPES_RECEIVED = 'WORKOUT_TYPES_RECEIVED',
     LIFT_TYPES_RECEIVED = 'LIFT_TYPES_RECEIVED',
     WORKOUT_SUMMARIES_RECEIVED = 'WORKOUT_SUMMARIES_RECEIVED',
+    SELECTED_WORKOUT_RECEIVED = 'SELECTED_WORKOUT_RECEIVED',
+    CLEAR_SELECTED_WORKOUT = 'CLEAR_SELECTED_WORKOUT',
+    SELECT_REP = 'SELECT_REP',
+    SELECT_WEIGHT = 'SELECT_WEIGHT',
+    SET_DELETED = 'SET_DELETED',
+    LIFT_DELETED = 'LIFT_DELETED',
 
     SIGNED_IN = 'SIGNED_IN',
     OTHER_ACTION = '__any_other_action_type__'
 }
-
-export type ActionTypes = SubmitPhotoAction|SelectPhotoAction|SelectChallengeAction|NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction;
 
 export interface OtherAction {
     type: ActionTypeKeys.OTHER_ACTION;
@@ -131,6 +136,77 @@ function workoutSummariesReceived(workoutSummaries:{[key:string]:WorkoutSummary}
         workoutSummaries
     }
 }
+
+export interface ClearSelectedWorkoutAction {
+    type:ActionTypeKeys.CLEAR_SELECTED_WORKOUT
+}
+
+function selectedWorkoutCleared():ClearSelectedWorkoutAction {
+    return {
+        type:ActionTypeKeys.CLEAR_SELECTED_WORKOUT
+    }
+}
+
+export interface WorkoutReceivedAction {
+    type:ActionTypeKeys.SELECTED_WORKOUT_RECEIVED;
+    workout:Workout;
+}
+
+
+function selectedWorkoutReceived(workout:Workout):WorkoutReceivedAction {
+    return {
+        type:ActionTypeKeys.SELECTED_WORKOUT_RECEIVED,
+        workout
+    }
+}
+
+export function selectWorkoutAsync(id:string){
+    return async (dispatch:any,state:()=>AppStateModel) => {
+        dispatch(selectedWorkoutCleared());
+        const f = new FirebaseService();
+        let workout;
+        try{
+            let uid = state().user.uid;
+            workout = (await f.getAsync<Workout>(`/users/${uid}/workouts/`,id))[id];
+        }catch(error){
+            console.log('error:',error);
+        }
+        if(workout !== undefined)
+            dispatch(selectedWorkoutReceived(workout as Workout));
+    }
+}
+
+export interface SelectWeightAction {
+    type:ActionTypeKeys.SELECT_WEIGHT;
+    workoutSet:WorkoutSet;
+    liftTypeKey:string;
+}
+
+
+export function selectWeight(workoutSet:WorkoutSet,liftTypeKey:string):SelectWeightAction {
+    return {
+        type:ActionTypeKeys.SELECT_WEIGHT,
+        workoutSet,
+        liftTypeKey
+    }
+}
+
+export interface SelectRepAction {
+    type:ActionTypeKeys.SELECT_REP;
+    workoutSet:WorkoutSet;
+    liftTypeKey:string;
+}
+
+
+export function selectRep(workoutSet:WorkoutSet,liftTypeKey:string):SelectRepAction {
+    return {
+        type:ActionTypeKeys.SELECT_REP,
+        workoutSet,
+        liftTypeKey
+    }
+}
+
+export type ActionTypes = SubmitPhotoAction|SelectPhotoAction|SelectChallengeAction|NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction;
 
 
 export interface SelectPhotoAction {

@@ -18,7 +18,7 @@ const navigationReducer = (state:any = initialState, action:ActionTypes) => {
             //return {...state, route:`/challenges/`};
         }
         default:
-            return initialState.toJS();
+            return state || initialState.toJS();
     }
 };
 

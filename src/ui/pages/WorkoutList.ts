@@ -5,6 +5,8 @@ import {workoutSummaryWithLiftNamesSelector} from "../../state/reducers/workout-
 
 import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property-decorator";
 import "../layout/WorkoutSummaryListItem";
+import { navigate } from "../../state/actions/Actions";
+import * as moment from "../../../node_modules/moment/moment";
 
 const html = (template:any) => template.toString();
 
@@ -13,16 +15,18 @@ class WorkoutList extends PolymerElement implements ReduxBindable {
     workoutSummaries:Array<WorkoutSummary>;
 
     @Property()
+    userId:string;
+
+    @Property()
     IOS = false;
 
     static get template() {
         return html`
             <style>
-                workout-summary-item {
+                workout-summary-list-item {
                     display:flex;
                     flex-direction:column;
                     padding-bottom:8px;
-                    pointer-events: none;
                 }
             </style>
             <div>
@@ -42,7 +46,7 @@ class WorkoutList extends PolymerElement implements ReduxBindable {
                                 </ul>
                             </div>
                             <div slot="footer">
-                                <moment-js date="[[workoutSummary.startDate]]" from-now></moment-js>
+                                [[formatDate(workoutSummary.startDate)]]
                             </div>                        
                         </workout-summary-list-item>
                     </template>
@@ -52,8 +56,8 @@ class WorkoutList extends PolymerElement implements ReduxBindable {
     }
 
     _workoutSummarySelected(event:any){
-        let workoutSummary = event.model.item;
-        // appState.dispatch(selectChallenge(challenge.id))
+        let workoutSummary:WorkoutSummary = event.model.workoutSummary;
+        appState.dispatch(navigate(`/edit-workout/${this.userId}/${workoutSummary.id}/`))
     }
 
     connectedCallback() {
@@ -62,9 +66,13 @@ class WorkoutList extends PolymerElement implements ReduxBindable {
         connectToRedux(this);
     }
 
+    formatDate(date:string){
+        return moment(date).fromNow();
+    }
+
     stateReceiver(state:any) {
+        this.userId = state.user.uid;
         this.workoutSummaries = workoutSummaryWithLiftNamesSelector(state);
-        console.log(this.workoutSummaries);
     }
 
 
