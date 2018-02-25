@@ -31,8 +31,9 @@ class MyApp extends PolymerElement implements ReduxBindable {
 
     static get template() {
         return html`
-        <style>
-            --app-primary-color: var(--paper-light-blue-400);
+        <style is="custom-style">
+        html {
+            --app-primary-color: #0000FF;
             --primary-color: var(--app-primary-color);
             --app-dark: var(--paper-grey-100);
             --app-grey-1: var(--paper-grey-100);
@@ -41,6 +42,7 @@ class MyApp extends PolymerElement implements ReduxBindable {
             --app-grey-4: var(--paper-grey-800);
             --app-text-color: var(--paper-grey-700);
             color: var(--app-text-color);
+        }
         </style>
         <app-location route="{{route}}"></app-location>
         <app-route route="[[route]]" pattern="/:page" data="{{routeData}}"></app-route>

@@ -4,6 +4,9 @@ import "../../../node_modules/@polymer/iron-pages/iron-pages.js";
 import "../../../node_modules/@polymer/paper-tabs/paper-tabs.js";
 import "../../../node_modules/@polymer/paper-tabs/paper-tab.js";
 import "../../../node_modules/@polymer/paper-button/paper-button.js";
+import "../../../node_modules/@polymer/paper-slider/paper-slider.js";
+import "../../../node_modules/@polymer/iron-icon/iron-icon.js";
+import "../../../node_modules/@polymer/iron-iconset-svg/iron-iconset-svg.js";
 import Observe from "../../../node_modules/@leavittsoftware/polymer-ts/observe-decorator";
 
 import "./PlateDrawing";
@@ -49,17 +52,13 @@ class PaperPlates extends PolymerElement {
     @Property()
     hasChanges: boolean;
 
+    @Property()
+    saveAmount:(amount:number)=>{};
+
     static get template() {
         return html`
             <style>
-            --app-primary-color: var(--paper-light-blue-400);
-            --primary-color: var(--app-primary-color);
-            --app-dark: var(--paper-grey-100);
-            --app-grey-1: var(--paper-grey-100);
-            --app-grey-2: var(--paper-grey-300);
-            --app-grey-3: var(--paper-grey-500);
-            --app-grey-4: var(--paper-grey-800);
-            --app-text-color: var(--paper-grey-700);
+
             :host {
                 @apply --layout-flex-auto;
                 @apply --layout-vertical;
@@ -68,12 +67,12 @@ class PaperPlates extends PolymerElement {
             paper-tabs {
                 display: block;
                 overflow: initial;
-                --paper-tabs-selection-bar-color: var(--app-primary-color);
+                --paper-tabs-selection-bar-color: var(--paper-purple-100);
             }
 
             paper-tab {
                 --paper-tab-ink: var(--app-primary-color);
-                background-color: var(--app-grey-1);
+                background-color: var(--app-primary-color);
                 color: var(--app-text-color);
             }
 
@@ -230,6 +229,16 @@ class PaperPlates extends PolymerElement {
                     display:none:!important;
                 }
             </style>
+            <iron-iconset-svg name="inline">
+                <svg>
+                    <defs>
+                        <g id="backspace">
+                        <path d="M22,3H7C6.31,3 5.77,3.35 5.41,3.88L0,12L5.41,20.11C5.77,20.64 6.31,21 7,21H22A2,2 0 0,0 24,19V5A2,2 0 0,0 22,3M19,15.59L17.59,17L14,13.41L10.41,17L9,15.59L12.59,12L9,8.41L10.41,7L14,10.59L17.59,7L19,8.41L15.41,12"/>
+                        </g>
+                    </defs>
+                </svg>
+            </iron-iconset-svg>
+
             <paper-tabs no-bar attr-for-selected="name" selected="{{entryType}}">
                 <paper-tab name="barbell">Barbell</paper-tab>
                 <paper-tab name="dumbbell">Dumbbell</paper-tab>
@@ -287,7 +296,7 @@ class PaperPlates extends PolymerElement {
                         </div>
                         <div class="button-container-row">
                             <paper-button class="flat-button-primary" on-tap="clear">
-                                <iron-icon icon="my-icons:backspace"></iron-icon>
+                                <iron-icon icon="inline:backspace"></iron-icon>
                             </paper-button>
                             <!-- <paper-button class="flat-button-primary" on-tap="decrement">-</paper-button> -->
                             <paper-button class="flat-button-primary" on-tap="addDigit" value="0">0</paper-button>
@@ -301,6 +310,14 @@ class PaperPlates extends PolymerElement {
                 </div>
             </iron-pages>
         `
+    }
+
+    okButton() {
+        if (this.hasChanges) {
+            this.saveAmount(this.amount);
+        }
+        this.hasChanges = false;
+        //TODO:exit paper-plates without saving
     }
 
     @Observe('amount')
@@ -341,6 +358,63 @@ class PaperPlates extends PolymerElement {
             }
             this.set('plates', plates.reverse());
         }
+    }
+
+    addPlate(e:any) {
+        let plateAmount: number = e.model.item;
+        this.set('amount', this.amount * 1 + plateAmount);
+        this.hasChanges = true;
+    }
+
+    removePlate(e:any) {
+        let weight = e.model.item;
+        this.set('amount', this.amount * 1 - weight);
+        this.hasChanges = true;
+    }
+
+    addBarbellPlate(e:any) {
+        let plateAmount: number = e.model.item;
+        this.set('amount', Math.max(this.amount * 1 + plateAmount * 2, this.barbellWeight * 1 + plateAmount * 2));
+        this.hasChanges = true;
+    }
+
+    removeBarbellPlate(e:any) {
+        let weight = e.model.item;
+        this.set('amount', this.amount * 1 - weight * 2);
+        this.hasChanges = true;
+    }
+
+    addDigit(e:any) {
+        let digit = e.currentTarget.getAttribute('value');
+        this.set('amount', Number((this.amount || '').toString() + digit));
+        this.hasChanges = true;
+    }
+
+    selectDumbbell(e:any) {
+
+    }
+
+    increment() {
+        this.set('amount', parseInt(this.amount.toString() || '0', 10) + 5);
+        this.hasChanges = true;
+    }
+
+    decrement() {
+        this.set('amount', Math.max(parseInt(this.amount.toString() || '0', 10) - 5, 0));
+        this.hasChanges = true;
+    }
+
+    clear() {
+        if (!this.amount)
+            return;
+        let amount = this.amount.toString();
+        amount = amount.substr(0, amount.length - 1);
+        this.set('amount', parseInt(amount, 10) || null);
+        this.hasChanges = true;
+    }
+
+    open() {
+        this.$.dialog.open();
     }
 
     connectedCallback() {

@@ -19,9 +19,9 @@ const workoutSummaryReducer = (state:any, action:ActionTypes) => {
 const workoutSummaryWithLiftNamesSelector = (state:AppStateModel) => {
     return Object.keys(state.workoutSummaries).map((key)=>{
         const workoutSummary = state.workoutSummaries[key];
-        const liftTypeNames = workoutSummary.liftTypeKeys.map((liftTypeKey)=>{
+        const liftTypeNames = workoutSummary.liftTypeKeys ? workoutSummary.liftTypeKeys.map((liftTypeKey)=>{
             return state.liftTypes[liftTypeKey].name || '';
-        })
+        }) : '';
         return Object.assign({},workoutSummary,{liftTypeNames,id:key});
     }).sort((a,b)=>{
         return b.startDate - a.startDate; 

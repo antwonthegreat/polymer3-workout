@@ -5,7 +5,7 @@ import {workoutSummaryWithLiftNamesSelector} from "../../state/reducers/workout-
 
 import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property-decorator";
 import "../layout/WorkoutSummaryListItem";
-import { selectWorkoutAsync, selectWeight,selectRep } from "../../state/actions/Actions";
+import { selectWorkoutAsync, selectWeight,selectRep, updateSelectedWorkoutSetWeightAsync, updateSelectedWorkoutSetRepsAsync } from "../../state/actions/Actions";
 import { selectedWorkoutSelector,selectedWorkoutSetSelector } from "../../state/reducers/selected-workout-reducer";
 import Observe from "../../../node_modules/@leavittsoftware/polymer-ts/observe-decorator";
 import "../../../node_modules/@polymer/iron-pages/iron-pages.js";
@@ -34,6 +34,16 @@ class EditWorkout extends PolymerElement implements ReduxBindable {
     @Property()
     page:string
 
+    @Property()
+    saveWeight = (weight:number)=>{
+        appState.dispatch(updateSelectedWorkoutSetWeightAsync(weight));
+    }
+
+    @Property()
+    saveReps = (reps:number)=>{
+        appState.dispatch(updateSelectedWorkoutSetRepsAsync(reps));
+    }
+
     static get template() {
         return html`
             <style>
@@ -52,8 +62,8 @@ class EditWorkout extends PolymerElement implements ReduxBindable {
                         </template>
                     </dom-repeat>
                 </main>
-                <paper-plates name="rep" amount=[[selectedWorkoutSet.reps]] is-reps></paper-plates>
-                <paper-plates name="weight" amount=[[selectedWorkoutSet.weight]]></paper-plates>
+                <paper-plates name="rep" save-amount="[[saveReps]]" amount="[[selectedWorkoutSet.reps]]"  is-reps></paper-plates>
+                <paper-plates name="weight" save-amount="[[saveWeight]]" amount="[[selectedWorkoutSet.weight]]"></paper-plates>
             </iron-pages>
         `
     }

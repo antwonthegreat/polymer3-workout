@@ -21,6 +21,9 @@ export enum ActionTypeKeys {
     SELECT_WEIGHT = 'SELECT_WEIGHT',
     SET_DELETED = 'SET_DELETED',
     LIFT_DELETED = 'LIFT_DELETED',
+    SELECTED_WORKOUT_UPDATED = 'SELECTED_WORKOUT_UPDATED',
+    UPDATE_SELECTED_WORKOUTSET_WEIGHT = 'UPDATE_SELECTED_WORKOUTSET_WEIGHT',
+    UPDATE_SELECTED_WORKOUTSET_REPS = 'UPDATE_SELECTED_WORKOUTSET_REPS',
 
     SIGNED_IN = 'SIGNED_IN',
     OTHER_ACTION = '__any_other_action_type__'
@@ -154,6 +157,16 @@ export interface WorkoutReceivedAction {
 
 
 function selectedWorkoutReceived(workout:Workout):WorkoutReceivedAction {
+    if(workout.lifts){
+        workout.lifts.forEach(lift=>{
+            if(lift.sets){
+                lift.sets.forEach(set=>{
+                    if(!set.key)
+                        set.key = generatePushID();
+                });
+            };
+        });
+    }
     return {
         type:ActionTypeKeys.SELECTED_WORKOUT_RECEIVED,
         workout
@@ -206,7 +219,69 @@ export function selectRep(workoutSet:WorkoutSet,liftTypeKey:string):SelectRepAct
     }
 }
 
-export type ActionTypes = SubmitPhotoAction|SelectPhotoAction|SelectChallengeAction|NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction;
+export interface SelectedWorkoutUpdatedAction {
+    type:ActionTypeKeys.SELECTED_WORKOUT_UPDATED
+}
+
+function selectedWorkoutUpdated():SelectedWorkoutUpdatedAction {
+    return {
+        type:ActionTypeKeys.SELECTED_WORKOUT_UPDATED
+    }
+}
+
+export interface updateSelectedWorkoutSetWeightAction {
+    type:ActionTypeKeys.UPDATE_SELECTED_WORKOUTSET_WEIGHT,
+    weight:number;
+}
+
+function updateSelectedWorkoutSetWeight(weight:number): updateSelectedWorkoutSetWeightAction {
+    return {
+        type:ActionTypeKeys.UPDATE_SELECTED_WORKOUTSET_WEIGHT,
+        weight
+    }
+}
+
+export function updateSelectedWorkoutSetWeightAsync(weight:number){
+    return async (dispatch:any,state:()=>AppStateModel) => {
+        const f = new FirebaseService();
+        dispatch(updateSelectedWorkoutSetWeight(weight));
+        try{
+            let uid = state().user.uid;
+            const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
+        }catch(error){
+            console.log('error:',error);
+        }
+        dispatch(selectedWorkoutUpdated());
+    }
+}
+
+export interface updateSelectedWorkoutSetRepsAction {
+    type:ActionTypeKeys.UPDATE_SELECTED_WORKOUTSET_REPS,
+    reps:number;
+}
+
+function updateSelectedWorkoutSetReps(reps:number): updateSelectedWorkoutSetRepsAction {
+    return {
+        type:ActionTypeKeys.UPDATE_SELECTED_WORKOUTSET_REPS,
+        reps
+    }
+}
+
+export function updateSelectedWorkoutSetRepsAsync(reps:number){
+    return async (dispatch:any,state:()=>AppStateModel) => {
+        const f = new FirebaseService();
+        dispatch(updateSelectedWorkoutSetReps(reps));
+        try{
+            let uid = state().user.uid;
+            const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
+        }catch(error){
+            console.log('error:',error);
+        }
+        dispatch(selectedWorkoutUpdated());
+    }
+}
+
+export type ActionTypes = SubmitPhotoAction|SelectPhotoAction|SelectChallengeAction|NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction;
 
 
 export interface SelectPhotoAction {
@@ -260,3 +335,49 @@ export function navigate(route:string):NavigateAction {
         route
     }
 }
+
+function generatePushID () {
+    // Modeled after base64 web-safe chars, but ordered by ASCII.
+    var PUSH_CHARS = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz';
+  
+    // Timestamp of last push, used to prevent local collisions if you push twice in one ms.
+    var lastPushTime = 0;
+  
+    // We generate 72-bits of randomness which get turned into 12 characters and appended to the
+    // timestamp to prevent collisions with other clients.  We store the last characters we
+    // generated because in the event of a collision, we'll use those same characters except
+    // "incremented" by one.
+    var lastRandChars:Array<number> = [];
+  
+    var now = new Date().getTime();
+    var duplicateTime = (now === lastPushTime);
+    lastPushTime = now;
+
+    var timeStampChars = new Array(8);
+    for (var i = 7; i >= 0; i--) {
+    timeStampChars[i] = PUSH_CHARS.charAt(now % 64);
+    // NOTE: Can't use << here because javascript will convert to int and lose the upper bits.
+    now = Math.floor(now / 64);
+    }
+    if (now !== 0) throw new Error('We should have converted the entire timestamp.');
+
+    var id = timeStampChars.join('');
+
+    if (!duplicateTime) {
+    for (i = 0; i < 12; i++) {
+        lastRandChars[i] = Math.floor(Math.random() * 64);
+    }
+    } else {
+    // If the timestamp hasn't changed since last push, use the same random number, except incremented by 1.
+    for (i = 11; i >= 0 && lastRandChars[i] === 63; i--) {
+        lastRandChars[i] = 0;
+    }
+    lastRandChars[i]++;
+    }
+    for (i = 0; i < 12; i++) {
+    id += PUSH_CHARS.charAt(lastRandChars[i]);
+    }
+    if(id.length != 20) throw new Error('Length should be 20.');
+
+    return id;
+  };

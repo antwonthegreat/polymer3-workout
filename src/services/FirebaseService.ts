@@ -61,10 +61,17 @@ class FirebaseService {
             return {};
         }
 
-        if(id){
-            val[id].id = id;
-        }
+        // if(id && !val.key){
+        //     val[id].id = id;
+        // }
         return val;    
+    }
+
+    async patchAsync<T>(path: string, key: string, value: any): Promise<T> {
+        let updates:any = {};
+        updates[`${path}/${key}`] = value;
+        const result = await firebase.database().ref().update(updates);
+        return result;
     }
 
 }

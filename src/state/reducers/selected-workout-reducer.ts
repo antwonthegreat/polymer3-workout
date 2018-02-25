@@ -5,7 +5,7 @@ import {ActionTypes,ActionTypeKeys} from '../actions/Actions';
 
 const initialState = Map({});
 
-const selectedWorkoutReducer = (state:any, action:ActionTypes) => {
+const selectedWorkoutReducer = (state:AppStateModel['selectedWorkout'], action:ActionTypes) => {
     switch (action.type) {
         case ActionTypeKeys.CLEAR_SELECTED_WORKOUT: { 
             return {};
@@ -18,6 +18,34 @@ const selectedWorkoutReducer = (state:any, action:ActionTypes) => {
         }
         case ActionTypeKeys.SELECT_REP: {
             return fromJS(state).set('editMode','rep').set('liftTypeKey',action.liftTypeKey).set('workoutSet',action.workoutSet).toJS();
+        }
+        case ActionTypeKeys.UPDATE_SELECTED_WORKOUTSET_WEIGHT: {
+            const lift = state.workout.lifts.filter(lift => lift.liftTypeKey === state.liftTypeKey)[0];
+            if(!lift)
+                return;
+
+            const liftIndex = state.workout.lifts.indexOf(lift);
+            const workoutSet = lift.sets.filter(workoutSet => workoutSet.key === state.workoutSet.key)[0];
+
+            if(!workoutSet)
+                return;
+
+            const workoutSetIndex = lift.sets.indexOf(workoutSet);
+            return fromJS(state).setIn(['workout','lifts',liftIndex,'sets',workoutSetIndex,'weight'],action.weight).set('editMode',null).toJS();
+        }
+        case ActionTypeKeys.UPDATE_SELECTED_WORKOUTSET_REPS: {
+            const lift = state.workout.lifts.filter(lift => lift.liftTypeKey === state.liftTypeKey)[0];
+            if(!lift)
+                return;
+
+            const liftIndex = state.workout.lifts.indexOf(lift);
+            const workoutSet = lift.sets.filter(workoutSet => workoutSet.key === state.workoutSet.key)[0];
+
+            if(!workoutSet)
+                return;
+
+            const workoutSetIndex = lift.sets.indexOf(workoutSet);
+            return fromJS(state).setIn(['workout','lifts',liftIndex,'sets',workoutSetIndex,'reps'],action.reps).set('editMode',null).toJS();
         }
         default:
             return state || initialState.toJS();
