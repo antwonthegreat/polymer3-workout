@@ -9,14 +9,6 @@ const navigationReducer = (state:any = initialState, action:ActionTypes) => {
             return fromJS(state).set('route',action.route).toJS();
             // return {...state, route:action.route};
         }
-        case ActionTypeKeys.SELECT_CHALLENGE: {
-            return fromJS(state).set('route',`/challenge/${action.id}/`).toJS();
-            //return {...state, route:`/challenge/${action.id}/`};
-        }
-        case ActionTypeKeys.SUBMIT_PHOTO: {
-            return fromJS(state).set('route','/challenges/').toJS();
-            //return {...state, route:`/challenges/`};
-        }
         default:
             return state || initialState.toJS();
     }

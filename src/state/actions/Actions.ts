@@ -8,9 +8,6 @@
 import {FirebaseService} from "../../services/FirebaseService";
 
 export enum ActionTypeKeys {
-    SELECT_PHOTO = 'SELECT_PHOTO',
-    SUBMIT_PHOTO = 'SUBMIT_PHOTO',
-    SELECT_CHALLENGE = 'SELECT_CHALLENGE',
     NAVIGATE = 'NAVIGATE',
     WORKOUT_TYPES_RECEIVED = 'WORKOUT_TYPES_RECEIVED',
     LIFT_TYPES_RECEIVED = 'LIFT_TYPES_RECEIVED',
@@ -281,48 +278,7 @@ export function updateSelectedWorkoutSetRepsAsync(reps:number){
     }
 }
 
-export type ActionTypes = SubmitPhotoAction|SelectPhotoAction|SelectChallengeAction|NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction;
-
-
-export interface SelectPhotoAction {
-    type:ActionTypeKeys.SELECT_PHOTO;
-    id:string
-}
-
-export function selectPhoto(id:string):SelectPhotoAction {
-    return {
-        type:ActionTypeKeys.SELECT_PHOTO,
-        id
-    }
-}
-
-export interface SubmitPhotoAction {
-    type:ActionTypeKeys.SUBMIT_PHOTO;
-    id:string,
-    challengeId:string,
-    path:string
-}
-
-export function submitPhoto(id:string,challengeId:string,path:string):SubmitPhotoAction {
-    return {
-        type:ActionTypeKeys.SUBMIT_PHOTO,
-        id,
-        challengeId,
-        path
-    }
-}
-
-export interface SelectChallengeAction {
-    type:ActionTypeKeys.SELECT_CHALLENGE;
-    id:string
-}
-
-export function selectChallenge(id:string):SelectChallengeAction {
-    return {
-        type:ActionTypeKeys.SELECT_CHALLENGE,
-        id
-    }
-}
+export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction;
 
 export interface NavigateAction {
     type:ActionTypeKeys.NAVIGATE;
