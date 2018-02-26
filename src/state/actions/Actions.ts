@@ -57,7 +57,7 @@ function signedIn(user:any):SignedInAction {
 export interface workoutTypesReceivedAction {
     type:ActionTypeKeys.WORKOUT_TYPES_RECEIVED;
     workoutTypes:{[key:string]:WorkoutType},
-    user:firebase.User
+    user:Partial<firebase.User>
 }
 
 export function getWorkoutTypesAsync(){
@@ -74,7 +74,7 @@ export function getWorkoutTypesAsync(){
     }
 }
 
-function workoutTypesReceived(workoutTypes:{[key:string]:WorkoutType},user:firebase.User):workoutTypesReceivedAction {
+export function workoutTypesReceived(workoutTypes:{[key:string]:WorkoutType},user:Partial<firebase.User>):workoutTypesReceivedAction {
     return {
         type:ActionTypeKeys.WORKOUT_TYPES_RECEIVED,
         workoutTypes,
@@ -85,7 +85,7 @@ function workoutTypesReceived(workoutTypes:{[key:string]:WorkoutType},user:fireb
 export interface liftTypesReceivedAction {
     type:ActionTypeKeys.LIFT_TYPES_RECEIVED;
     liftTypes:{[key:string]:LiftType},
-    user:firebase.User
+    user:Partial<firebase.User>
 }
 
 export function getLiftTypesAsync(){
@@ -102,7 +102,7 @@ export function getLiftTypesAsync(){
     }
 }
 
-function liftTypesReceived(liftTypes:{[key:string]:LiftType},user:firebase.User):liftTypesReceivedAction {
+export function liftTypesReceived(liftTypes:{[key:string]:LiftType},user:Partial<firebase.User>):liftTypesReceivedAction {
     return {
         type:ActionTypeKeys.LIFT_TYPES_RECEIVED,
         liftTypes,
@@ -130,7 +130,7 @@ export function getWorkoutSummariesAsync(){
     }
 }
 
-function workoutSummariesReceived(workoutSummaries:{[key:string]:WorkoutSummary}):workoutSummariesReceivedAction {
+export function workoutSummariesReceived(workoutSummaries:{[key:string]:WorkoutSummary}):workoutSummariesReceivedAction {
     return {
         type:ActionTypeKeys.WORKOUT_SUMMARIES_RECEIVED,
         workoutSummaries

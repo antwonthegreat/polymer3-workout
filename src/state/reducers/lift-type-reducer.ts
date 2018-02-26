@@ -9,7 +9,7 @@ const liftTypeReducer = (state:any, action:ActionTypes) => {
     switch (action.type) {
         case ActionTypeKeys.LIFT_TYPES_RECEIVED: {
             Object.keys(action.liftTypes).forEach((key)=>{
-                action.liftTypes[key].active = !!action.liftTypes[key].users[action.user.uid];
+                action.liftTypes[key].active = !!action.user.uid && !!action.liftTypes[key].users[action.user.uid];
             })
             return action.liftTypes;
         }
