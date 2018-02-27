@@ -57,7 +57,7 @@ class LiftListItem extends PolymerElement {
                 </label-container>
                 <dom-repeat items="[[lift.sets]]" as="workoutSet" restamp>
                     <template>
-                        <workout-set-list-item workout-set="[[workoutSet]]" lift-type-key="[[lift.liftTypeKey]]" select-weight="[[selectWeight]]" select-rep="[[selectRep]]"></workout-set-list-item>
+                        <workout-set-list-item workout-set="[[workoutSet]]" lift-type-key="[[lift.liftTypeKey]]" select-weight="[[selectWeight]]" select-rep="[[selectRep]]" delete-set="[[deleteSet]]"></workout-set-list-item>
                     </template>
                 </dom-repeat>
             </lift-body>

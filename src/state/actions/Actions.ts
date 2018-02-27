@@ -21,6 +21,7 @@ export enum ActionTypeKeys {
     SELECTED_WORKOUT_UPDATED = 'SELECTED_WORKOUT_UPDATED',
     UPDATE_SELECTED_WORKOUTSET_WEIGHT = 'UPDATE_SELECTED_WORKOUTSET_WEIGHT',
     UPDATE_SELECTED_WORKOUTSET_REPS = 'UPDATE_SELECTED_WORKOUTSET_REPS',
+    DELETE_SET = 'DELETE_SET',
 
     SIGNED_IN = 'SIGNED_IN',
     OTHER_ACTION = '__any_other_action_type__'
@@ -141,7 +142,7 @@ export interface ClearSelectedWorkoutAction {
     type:ActionTypeKeys.CLEAR_SELECTED_WORKOUT
 }
 
-function selectedWorkoutCleared():ClearSelectedWorkoutAction {
+export function selectedWorkoutCleared():ClearSelectedWorkoutAction {
     return {
         type:ActionTypeKeys.CLEAR_SELECTED_WORKOUT
     }
@@ -153,7 +154,7 @@ export interface WorkoutReceivedAction {
 }
 
 
-function selectedWorkoutReceived(workout:Workout):WorkoutReceivedAction {
+export function selectedWorkoutReceived(workout:Workout):WorkoutReceivedAction {
     if(workout.lifts){
         workout.lifts.forEach(lift=>{
             if(lift.sets){
@@ -220,7 +221,7 @@ export interface SelectedWorkoutUpdatedAction {
     type:ActionTypeKeys.SELECTED_WORKOUT_UPDATED
 }
 
-function selectedWorkoutUpdated():SelectedWorkoutUpdatedAction {
+export function selectedWorkoutUpdated():SelectedWorkoutUpdatedAction {
     return {
         type:ActionTypeKeys.SELECTED_WORKOUT_UPDATED
     }
@@ -231,7 +232,7 @@ export interface updateSelectedWorkoutSetWeightAction {
     weight:number;
 }
 
-function updateSelectedWorkoutSetWeight(weight:number): updateSelectedWorkoutSetWeightAction {
+export function updateSelectedWorkoutSetWeight(weight:number): updateSelectedWorkoutSetWeightAction {
     return {
         type:ActionTypeKeys.UPDATE_SELECTED_WORKOUTSET_WEIGHT,
         weight
@@ -257,7 +258,7 @@ export interface updateSelectedWorkoutSetRepsAction {
     reps:number;
 }
 
-function updateSelectedWorkoutSetReps(reps:number): updateSelectedWorkoutSetRepsAction {
+export function updateSelectedWorkoutSetReps(reps:number): updateSelectedWorkoutSetRepsAction {
     return {
         type:ActionTypeKeys.UPDATE_SELECTED_WORKOUTSET_REPS,
         reps
@@ -278,7 +279,35 @@ export function updateSelectedWorkoutSetRepsAsync(reps:number){
     }
 }
 
-export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction;
+export interface deleteSetAction {
+    type:ActionTypeKeys.DELETE_SET,
+    key:string;
+    liftTypeKey:string;
+}
+
+export function deleteSet(key:string,liftTypeKey:string): deleteSetAction {
+    return {
+        type:ActionTypeKeys.DELETE_SET,
+        key,
+        liftTypeKey
+    }
+}
+
+export function deleteSetAsync(key:string,liftTypeKey:string){
+    return async (dispatch:any,state:()=>AppStateModel) => {
+        const f = new FirebaseService();
+        dispatch(deleteSet(key,liftTypeKey));
+        try{
+            let uid = state().user.uid;
+            const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
+        }catch(error){
+            console.log('error:',error);
+        }
+        dispatch(selectedWorkoutUpdated());
+    }
+}
+
+export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction|deleteSetAction;
 
 export interface NavigateAction {
     type:ActionTypeKeys.NAVIGATE;

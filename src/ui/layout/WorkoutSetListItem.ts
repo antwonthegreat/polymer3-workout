@@ -3,6 +3,7 @@ import {Element as PolymerElement} from "@polymer/polymer/polymer-element";
 import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property-decorator";
 import "../../../node_modules/@polymer/paper-icon-button/paper-icon-button.js";
 import "../../../node_modules/@polymer/iron-iconset-svg/iron-iconset-svg.js";
+import { deleteSet } from "../../state/actions/Actions";
 
 const html = (template:any) => template.toString();
 
@@ -18,6 +19,9 @@ class WorkoutSetListItem extends PolymerElement {
 
     @Property()
     selectRep:any;
+
+    @Property()
+    deleteSet:(key:string,liftTypeKey:string)=>{};
 
     static get template() {
         return html`
@@ -46,16 +50,20 @@ class WorkoutSetListItem extends PolymerElement {
             </iron-iconset-svg>
             <reps on-click="_selectRep">[[workoutSet.reps]]</reps>
             <weight on-click="_selectWeight">[[workoutSet.weight]]</weight>
-            <paper-icon-button icon="inline:delete"></paper-icon-button>
+            <paper-icon-button on-click="_deleteSet" icon="inline:delete"></paper-icon-button>
         `
     }
 
-    _selectWeight(){
+    private _selectWeight(){
         this.selectWeight(this.workoutSet,this.liftTypeKey);
     }
 
-    _selectRep(){
+    private _selectRep(){
         this.selectRep(this.workoutSet,this.liftTypeKey);
+    }
+
+    private _deleteSet(){
+        this.deleteSet(this.workoutSet.key,this.liftTypeKey);
     }
 }
 

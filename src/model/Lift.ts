@@ -4,5 +4,7 @@ interface Lift {
 
     //computed
     name:string;
-
+    liftType?:LiftType;
+    weightLabel?:string;
+    repLabel?:string;
 }

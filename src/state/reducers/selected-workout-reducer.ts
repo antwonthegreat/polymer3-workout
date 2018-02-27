@@ -1,5 +1,5 @@
 /// <reference path="../actions/Actions.ts" />
-import {Map, fromJS} from 'immutable';
+import {Map, List, fromJS} from 'immutable';
 
 import {ActionTypes,ActionTypeKeys} from '../actions/Actions';
 
@@ -22,13 +22,13 @@ const selectedWorkoutReducer = (state:AppStateModel['selectedWorkout'], action:A
         case ActionTypeKeys.UPDATE_SELECTED_WORKOUTSET_WEIGHT: {
             const lift = state.workout.lifts.filter(lift => lift.liftTypeKey === state.liftTypeKey)[0];
             if(!lift)
-                return;
+                return state;
 
             const liftIndex = state.workout.lifts.indexOf(lift);
             const workoutSet = lift.sets.filter(workoutSet => workoutSet.key === state.workoutSet.key)[0];
 
             if(!workoutSet)
-                return;
+                return state;
 
             const workoutSetIndex = lift.sets.indexOf(workoutSet);
             return fromJS(state).setIn(['workout','lifts',liftIndex,'sets',workoutSetIndex,'weight'],action.weight).set('editMode',null).toJS();
@@ -36,16 +36,30 @@ const selectedWorkoutReducer = (state:AppStateModel['selectedWorkout'], action:A
         case ActionTypeKeys.UPDATE_SELECTED_WORKOUTSET_REPS: {
             const lift = state.workout.lifts.filter(lift => lift.liftTypeKey === state.liftTypeKey)[0];
             if(!lift)
-                return;
+                return state;
 
             const liftIndex = state.workout.lifts.indexOf(lift);
             const workoutSet = lift.sets.filter(workoutSet => workoutSet.key === state.workoutSet.key)[0];
 
             if(!workoutSet)
-                return;
+                return state;
 
             const workoutSetIndex = lift.sets.indexOf(workoutSet);
             return fromJS(state).setIn(['workout','lifts',liftIndex,'sets',workoutSetIndex,'reps'],action.reps).set('editMode',null).toJS();
+        }
+        case ActionTypeKeys.DELETE_SET: {
+            const lift = state.workout.lifts.filter(lift => lift.liftTypeKey === action.liftTypeKey)[0];
+            if(!lift)
+                return state;
+
+            const liftIndex = state.workout.lifts.indexOf(lift);
+            const workoutSet = lift.sets.filter(workoutSet => workoutSet.key === action.key)[0];
+
+            if(!workoutSet)
+                return state;
+
+            const workoutSetIndex = lift.sets.indexOf(workoutSet);
+            return fromJS(state).updateIn(['workout','lifts',liftIndex,'sets'],(list:any) => list.splice(workoutSetIndex,1)).toJS();
         }
         default:
             return state || initialState.toJS();
