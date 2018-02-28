@@ -5,10 +5,22 @@ import {ActionTypes,ActionTypeKeys} from '../actions/Actions';
 
 const initialState = Map({});
 
-const workoutSummaryReducer = (state:any, action:ActionTypes) => {
+const workoutSummaryReducer = (state:AppStateModel['workoutSummaries'] = initialState.toJS(), action:ActionTypes) => {
     switch (action.type) {
         case ActionTypeKeys.WORKOUT_SUMMARIES_RECEIVED: { 
             return action.workoutSummaries;
+        }
+        case ActionTypeKeys.DELETE_LIFT: {
+            if(!action.selectedWorkoutKey)
+                return state;
+
+            const liftTypeKey = state[action.selectedWorkoutKey] && state[action.selectedWorkoutKey].liftTypeKeys.filter(liftTypeKey => liftTypeKey === action.liftTypeKey)[0];
+            if(!liftTypeKey)
+                return state;
+
+            const liftTypeKeyIndex = state[action.selectedWorkoutKey].liftTypeKeys.indexOf(liftTypeKey);
+
+            return fromJS(state).updateIn([action.selectedWorkoutKey,'liftTypeKeys'],(list:any) => list.splice(liftTypeKeyIndex,1)).toJS();
         }
         default:
             return state || initialState.toJS();

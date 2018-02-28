@@ -309,21 +309,24 @@ export function deleteSetAsync(key:string,liftTypeKey:string){
 }
 
 export interface deleteLiftAction {
-    type:ActionTypeKeys.DELETE_LIFT,
+    type:ActionTypeKeys.DELETE_LIFT;
     liftTypeKey:string;
+    selectedWorkoutKey:string;
 }
 
-export function deleteLift(liftTypeKey:string): deleteLiftAction {
+export function deleteLift(liftTypeKey:string,selectedWorkoutKey:string): deleteLiftAction {
     return {
         type:ActionTypeKeys.DELETE_LIFT,
-        liftTypeKey
+        liftTypeKey,
+        selectedWorkoutKey
     }
 }
 
 export function deleteLiftAsync(liftTypeKey:string){
     return async (dispatch:any,state:()=>AppStateModel) => {
         const f = new FirebaseService();
-        dispatch(deleteLift(liftTypeKey));
+        const selectedWorkoutKey = state().selectedWorkout.workout.key;
+        dispatch(deleteLift(liftTypeKey,selectedWorkoutKey));
         try{
             let uid = state().user.uid;
             const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);

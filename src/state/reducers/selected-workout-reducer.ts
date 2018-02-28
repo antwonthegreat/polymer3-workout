@@ -5,7 +5,7 @@ import {ActionTypes,ActionTypeKeys} from '../actions/Actions';
 
 const initialState = Map({});
 
-const selectedWorkoutReducer = (state:AppStateModel['selectedWorkout'], action:ActionTypes) => {
+const selectedWorkoutReducer = (state:AppStateModel['selectedWorkout'] = initialState.toJS(), action:ActionTypes) => {
     switch (action.type) {
         case ActionTypeKeys.CLEAR_SELECTED_WORKOUT: { 
             return {};
@@ -62,7 +62,7 @@ const selectedWorkoutReducer = (state:AppStateModel['selectedWorkout'], action:A
             return fromJS(state).updateIn(['workout','lifts',liftIndex,'sets'],(list:any) => list.splice(workoutSetIndex,1)).toJS();
         }
         case ActionTypeKeys.DELETE_LIFT: {
-            const lift = state.workout.lifts.filter(lift => lift.liftTypeKey === action.liftTypeKey)[0];
+            const lift = state && state.workout && state.workout.lifts && state.workout.lifts.filter(lift => lift.liftTypeKey === action.liftTypeKey)[0];
             if(!lift)
                 return state;
 
