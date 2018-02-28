@@ -12,6 +12,9 @@ class LiftListItem extends PolymerElement {
     @Property()
     lift:Lift;
 
+    @Property()
+    deleteLift:(liftTypeKey:string)=>{};
+
     static get template() {
         return html`
             <style>
@@ -47,7 +50,7 @@ class LiftListItem extends PolymerElement {
             <lift-header>
                 <iron-icon icon="inline:[[isComplete(lift.sets.length)]]"></iron-icon>
                 <lift-name>[[lift.name]]</lift-name>
-                <paper-icon-button icon="inline:close"></paper-icon-button>
+                <paper-icon-button icon="inline:close" on-click="_deleteLift"></paper-icon-button>
             </lift-header>
             <lift-body>
                 <personal-best lift="[[lift]]"></personal-best>
@@ -66,6 +69,10 @@ class LiftListItem extends PolymerElement {
 
     isComplete(setsCount:number){
         return setsCount ? 'done':'';
+    }
+
+    private _deleteLift(){
+        this.deleteLift(this.lift.liftTypeKey);
     }
 }
 

@@ -61,6 +61,14 @@ const selectedWorkoutReducer = (state:AppStateModel['selectedWorkout'], action:A
             const workoutSetIndex = lift.sets.indexOf(workoutSet);
             return fromJS(state).updateIn(['workout','lifts',liftIndex,'sets'],(list:any) => list.splice(workoutSetIndex,1)).toJS();
         }
+        case ActionTypeKeys.DELETE_LIFT: {
+            const lift = state.workout.lifts.filter(lift => lift.liftTypeKey === action.liftTypeKey)[0];
+            if(!lift)
+                return state;
+
+            const liftIndex = state.workout.lifts.indexOf(lift);
+            return fromJS(state).updateIn(['workout','lifts'],(list:any) => list.splice(liftIndex,1)).toJS();
+        }
         default:
             return state || initialState.toJS();
     }

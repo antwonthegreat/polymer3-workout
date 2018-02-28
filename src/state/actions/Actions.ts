@@ -22,6 +22,7 @@ export enum ActionTypeKeys {
     UPDATE_SELECTED_WORKOUTSET_WEIGHT = 'UPDATE_SELECTED_WORKOUTSET_WEIGHT',
     UPDATE_SELECTED_WORKOUTSET_REPS = 'UPDATE_SELECTED_WORKOUTSET_REPS',
     DELETE_SET = 'DELETE_SET',
+    DELETE_LIFT = 'DELETE_LIFT',
 
     SIGNED_IN = 'SIGNED_IN',
     OTHER_ACTION = '__any_other_action_type__'
@@ -307,7 +308,33 @@ export function deleteSetAsync(key:string,liftTypeKey:string){
     }
 }
 
-export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction|deleteSetAction;
+export interface deleteLiftAction {
+    type:ActionTypeKeys.DELETE_LIFT,
+    liftTypeKey:string;
+}
+
+export function deleteLift(liftTypeKey:string): deleteLiftAction {
+    return {
+        type:ActionTypeKeys.DELETE_LIFT,
+        liftTypeKey
+    }
+}
+
+export function deleteLiftAsync(liftTypeKey:string){
+    return async (dispatch:any,state:()=>AppStateModel) => {
+        const f = new FirebaseService();
+        dispatch(deleteLift(liftTypeKey));
+        try{
+            let uid = state().user.uid;
+            const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
+        }catch(error){
+            console.log('error:',error);
+        }
+        dispatch(selectedWorkoutUpdated());
+    }
+}
+
+export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction|deleteSetAction|deleteLiftAction;
 
 export interface NavigateAction {
     type:ActionTypeKeys.NAVIGATE;

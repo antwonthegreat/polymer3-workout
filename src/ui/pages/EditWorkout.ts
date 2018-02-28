@@ -5,7 +5,7 @@ import {workoutSummaryWithLiftNamesSelector} from "../../state/reducers/workout-
 
 import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property-decorator";
 import "../layout/WorkoutSummaryListItem";
-import { selectWorkoutAsync, selectWeight,selectRep, updateSelectedWorkoutSetWeightAsync, updateSelectedWorkoutSetRepsAsync, deleteSetAsync } from "../../state/actions/Actions";
+import { selectWorkoutAsync, selectWeight,selectRep, updateSelectedWorkoutSetWeightAsync, updateSelectedWorkoutSetRepsAsync, deleteSetAsync, deleteLiftAsync } from "../../state/actions/Actions";
 import { selectedWorkoutSelector,selectedWorkoutSetSelector } from "../../state/reducers/selected-workout-reducer";
 import Observe from "../../../node_modules/@leavittsoftware/polymer-ts/observe-decorator";
 import "../../../node_modules/@polymer/iron-pages/iron-pages.js";
@@ -49,6 +49,11 @@ class EditWorkout extends PolymerElement implements ReduxBindable {
         appState.dispatch(deleteSetAsync(key,liftTypeKey));
     };
 
+    @Property()
+    deleteLift = (liftTypeKey:string)=>{
+        appState.dispatch(deleteLiftAsync(liftTypeKey));
+    };
+
     static get template() {
         return html`
             <style>
@@ -63,7 +68,7 @@ class EditWorkout extends PolymerElement implements ReduxBindable {
                     <lifts-header>Lifts</lifts-header>
                     <dom-repeat items="[[workout.lifts]]" as="lift" restamp>
                         <template>
-                            <lift-list-item lift="[[lift]]" select-rep="[[selectRep]]" select-weight="[[selectWeight]]" delete-set="[[deleteSet]]"></lift-list-item>
+                            <lift-list-item lift="[[lift]]" select-rep="[[selectRep]]" select-weight="[[selectWeight]]" delete-set="[[deleteSet]]" delete-lift="[[deleteLift]]"></lift-list-item>
                         </template>
                     </dom-repeat>
                 </main>

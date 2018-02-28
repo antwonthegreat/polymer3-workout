@@ -2,7 +2,7 @@
 
 import {expect} from 'chai';
 import {reducer} from '../src/state/reducers/reducer.js';
-import {selectedWorkoutCleared,selectedWorkoutReceived,selectWeight,selectRep,updateSelectedWorkoutSetWeight,updateSelectedWorkoutSetReps, deleteSet} from '../src/state/actions/Actions.js';
+import {selectedWorkoutCleared,selectedWorkoutReceived,selectWeight,selectRep,updateSelectedWorkoutSetWeight,updateSelectedWorkoutSetReps, deleteSet, deleteLift} from '../src/state/actions/Actions.js';
 import {selectedWorkoutSelector,selectedWorkoutSetSelector} from '../src/state/reducers/selected-workout-reducer';
 
 describe('selected-workout-reducer', ()=>{
@@ -179,6 +179,44 @@ describe('selected-workout-reducer', ()=>{
 
         expect(nextState.selectedWorkout.workout.lifts[0].sets.length).to.equal(2);
         expect(nextState.selectedWorkout.workout.lifts[1].sets.length).to.equal(2);
+    });
+
+    it('deleteLift removes lift from selectedWorkout',()=>{
+        const lift = {liftTypeKey:'c',sets:[]};
+        const selectedLift = {liftTypeKey:'d',sets:[]};
+        const workout = {key:'e',lifts:[lift,selectedLift],name:'a',orderStartDate:1,startDate:1,id:'1'};
+        const initialState = {
+            selectedWorkout:{
+                workout:workout,
+                liftTypeKey:'d',
+                editMode:'weight'
+            }
+        };
+
+        const nextState = reducer(initialState,deleteLift('c'));
+
+        expect(nextState.selectedWorkout.workout.lifts.length).to.equal(1);
+        expect(nextState.selectedWorkout.workout.lifts[0].liftTypeKey).to.equal('d');
+    });
+
+    it('deleteLift does nothing if lift is not found',()=>{
+        const workoutSet = {key:'a',reps:1,weight:1};
+        const selectedWorkoutSet = {key:'b',reps:1,weight:1};
+        const lift = {liftTypeKey:'c',sets:[workoutSet,selectedWorkoutSet]};
+        const selectedLift = {liftTypeKey:'d',sets:[workoutSet,selectedWorkoutSet]};
+        const workout = {key:'e',lifts:[lift,selectedLift],name:'a',orderStartDate:1,startDate:1,id:'1'};
+        const initialState = {
+            selectedWorkout:{
+                workout:workout,
+                liftTypeKey:'d',
+                workoutSet:selectedWorkoutSet,
+                editMode:'weight'
+            }
+        };
+
+        const nextState = reducer(initialState,deleteLift('f'));
+
+        expect(nextState.selectedWorkout.workout.lifts.length).to.equal(2);
     });
 
     it('selectedWorkoutSelector returns null if no selectedWorkout',()=>{
