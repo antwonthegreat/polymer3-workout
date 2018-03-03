@@ -5,6 +5,8 @@ import {workoutSummaryWithLiftNamesSelector} from "../../state/reducers/workout-
 
 import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property-decorator";
 import "../layout/WorkoutSummaryListItem";
+import "../paper-fab-speed-dial/paper-fab-speed-dial";
+import "../paper-fab-speed-dial/paper-fab-speed-dial-action";
 import { navigate } from "../../state/actions/Actions";
 import * as moment from "../../../node_modules/moment/moment";
 
@@ -51,6 +53,10 @@ class WorkoutList extends PolymerElement implements ReduxBindable {
                         </workout-summary-list-item>
                     </template>
                 </dom-repeat>
+                <paper-fab-speed-dial>
+                    <paper-fab-speed-dial-action icon="icons:content-copy">Copy</paper-fab-speed-dial-action>
+                    <paper-fab-speed-dial-action icon="icons:print">Print</paper-fab-speed-dial-action>
+                </paper-fab-speed-dial>
             </div>
         `
     }
