@@ -28,5 +28,17 @@ describe('workout-type-reducer', ()=>{
         expect(nextState.workoutTypes.d.active).to.equal(true);
         expect(nextState.workoutTypes.c.active).to.equal(false);
     });
+
+    it('workoutTypesReceivedAction sets lastCompletedDate on each workoutType',()=>{
+        const initialState = {};
+
+        const nextState = reducer(initialState,workoutTypesReceived({
+            'd':{users:{'3':{startDate:4}},active:false},
+            'c':{users:{'4':{}},active:true}
+        }
+        ,{uid:'3'}));
+        expect(nextState.workoutTypes.d.lastCompletedDate).to.equal(4);
+        expect(nextState.workoutTypes.c.lastCompletedDate).to.equal(0);
+    });
 });
 

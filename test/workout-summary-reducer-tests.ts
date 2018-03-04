@@ -13,7 +13,7 @@ describe('workout-summary-reducer', ()=>{
             }
         };
 
-        const nextState = reducer(initialState,workoutSummariesReceived({'d':{liftTypeKeys:[''],name:'',orderStartDate:1,startDate:1,id:'1'}}));
+        const nextState = reducer(initialState,workoutSummariesReceived({'d':{liftTypeKeys:[''],name:'',orderStartDate:1,startDate:1,id:'1'}},{}));
         expect(nextState.workoutSummaries.d).to.not.equal(undefined);
         expect(nextState.workoutSummaries.w).to.equal(undefined);
     });
@@ -41,7 +41,7 @@ describe('workout-summary-reducer', ()=>{
             }
         };
 
-        const nextState = reducer(initialState,deleteLift('a','w'));
+        const nextState = reducer(initialState,deleteLift('a','w',{}));
         expect(nextState.workoutSummaries.w.liftTypeKeys.length).to.equal(1);
         expect(nextState.workoutSummaries.w.liftTypeKeys[0]).to.equal('b');
         expect(nextState.workoutSummaries.x.liftTypeKeys.length).to.equal(2);
@@ -65,7 +65,7 @@ describe('workout-summary-reducer', ()=>{
             }
         };
 
-        const nextState = reducer(initialState,deleteLift('a','c'));
+        const nextState = reducer(initialState,deleteLift('a','c',{}));
         expect(nextState.workoutSummaries.w.liftTypeKeys.length).to.equal(2);
         expect(nextState.workoutSummaries.x.liftTypeKeys.length).to.equal(2);
     });

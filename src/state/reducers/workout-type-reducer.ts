@@ -9,7 +9,11 @@ const workoutTypeReducer = (state:any, action:ActionTypes) => {
     switch (action.type) {
         case ActionTypeKeys.WORKOUT_TYPES_RECEIVED: { 
             Object.keys(action.workoutTypes).forEach((key)=>{
-                action.workoutTypes[key].active = !!action.user.uid && !!action.workoutTypes[key].users[action.user.uid];
+                const usersObject = action.user.uid && action.workoutTypes[key].users;
+                if(usersObject && action.user.uid){
+                    action.workoutTypes[key].active = !!usersObject[action.user.uid];
+                    action.workoutTypes[key].lastCompletedDate = !!usersObject[action.user.uid] ? usersObject[action.user.uid].startDate : 0 || 0;
+                }
             })
             return action.workoutTypes;
         }
