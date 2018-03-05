@@ -13,59 +13,13 @@ const liftTypeReducer = (state:any = initialState, action:ActionTypes) => {
             })
             return action.liftTypes;
         }
-        case ActionTypeKeys.WORKOUT_SUMMARIES_RECEIVED: {
-            return updateCompletedDates(state,action.workoutSummaries,action.workoutTypes,'','');
-        }
-        case ActionTypeKeys.DELETE_LIFT: {
-            return updateCompletedDates(state,action.workoutSummaries,action.workoutTypes,action.selectedWorkoutKey,action.liftTypeKey);
+        case ActionTypeKeys.UPDATE_LIFT_TYPES: {
+            return action.liftTypes || initialState.toJS();
         }
         default:
             return state || initialState.toJS();
     }
 };
-
-const updateCompletedDates = (state:any,workoutSummaries:{[key:string]:WorkoutSummary},workoutTypes:{[key:string]:WorkoutType},workoutKey:string,deletedLiftTypeKey:string) => {
-    let newState = fromJS(state);
-    if(workoutSummaries){
-        if(deletedLiftTypeKey){
-            newState = newState.setIn([deletedLiftTypeKey,'lastCompletedDate'],0);
-        }
-
-        //Set each liftType's lastCompleted date
-        Object.keys(workoutSummaries).forEach(key=>{
-            const workoutSummary = workoutSummaries[key];
-            if(workoutSummary.liftTypeKeys){
-                workoutSummary.liftTypeKeys.forEach(liftTypeKey => {
-                    if(workoutSummary.id !== workoutKey || liftTypeKey !== deletedLiftTypeKey ){
-                        newState = newState.updateIn([liftTypeKey,'lastCompletedDate'],(lastCompletedDate:number) => {
-                            return Math.max(lastCompletedDate||0,workoutSummary.startDate||0) 
-                        });
-                    }
-                });
-            }
-        });
-
-        //Set each liftType's completed
-        const liftTypes = newState.toJS();
-        Object.keys(liftTypes).forEach(liftTypeKey=>{
-            const liftType = liftTypes[liftTypeKey];
-            const workoutType = workoutTypes ? workoutTypes[liftType.workoutTypeKey] : null;
-            let completed = false;
-            if(liftType.workoutTypeKey === 'wta'){
-                console.log('!!!!',liftType, workoutType);
-            }
-            if(!liftType.lastCompletedDate){
-                completed = false;
-            } else if(!workoutType || !workoutType.lastCompletedDate){
-                completed = true;
-            }else{
-                completed = liftType.lastCompletedDate >= workoutType.lastCompletedDate;
-            }
-            newState = newState.setIn([liftTypeKey,'completed'],completed);
-        });
-    }
-    return newState.toJS();
-}
 
 const activeLiftTypeSelector = (state:AppStateModel, workoutTypeKey:string):Array<LiftType> => {
     if(!state.liftTypes)

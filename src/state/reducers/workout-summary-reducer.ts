@@ -7,7 +7,7 @@ const initialState = Map({});
 
 const workoutSummaryReducer = (state:AppStateModel['workoutSummaries'] = initialState.toJS(), action:ActionTypes) => {
     switch (action.type) {
-        case ActionTypeKeys.WORKOUT_SUMMARIES_RECEIVED: { 
+        case ActionTypeKeys.WORKOUT_SUMMARIES_RECEIVED: {
             return action.workoutSummaries;
         }
         case ActionTypeKeys.DELETE_LIFT: {

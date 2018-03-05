@@ -12,6 +12,7 @@ export enum ActionTypeKeys {
     NAVIGATE = 'NAVIGATE',
     WORKOUT_TYPES_RECEIVED = 'WORKOUT_TYPES_RECEIVED',
     LIFT_TYPES_RECEIVED = 'LIFT_TYPES_RECEIVED',
+    UPDATE_LIFT_TYPES = 'UPDATE_LIFT_TYPES',
     WORKOUT_SUMMARIES_RECEIVED = 'WORKOUT_SUMMARIES_RECEIVED',
     SELECTED_WORKOUT_RECEIVED = 'SELECTED_WORKOUT_RECEIVED',
     CLEAR_SELECTED_WORKOUT = 'CLEAR_SELECTED_WORKOUT',
@@ -113,10 +114,59 @@ export function liftTypesReceived(liftTypes:{[key:string]:LiftType},user:Partial
     }
 }
 
+export interface updateLiftTypesAction {
+    type:ActionTypeKeys.UPDATE_LIFT_TYPES;
+    liftTypes:{[key:string]:LiftType}
+}
+
+export function updateLiftTypes (liftTypes:{[key:string]:Partial<LiftType>},workoutSummaries:{[key:string]:WorkoutSummary},workoutTypes:{[key:string]:WorkoutType},workoutKey:string|null,deletedLiftTypeKey:string|null) : updateLiftTypesAction  {
+    let newLiftTypes = fromJS(liftTypes);
+    if(workoutSummaries){
+        if(deletedLiftTypeKey){
+            newLiftTypes = newLiftTypes.setIn([deletedLiftTypeKey,'lastCompletedDate'],0);
+        }
+
+        //Set each liftType's lastCompleted date
+        Object.keys(workoutSummaries).forEach(key=>{
+            const workoutSummary = workoutSummaries[key];
+            if(workoutSummary.liftTypeKeys){
+                workoutSummary.liftTypeKeys.forEach(liftTypeKey => {
+                    if(workoutSummary.id !== workoutKey || liftTypeKey !== deletedLiftTypeKey ){
+                        newLiftTypes = newLiftTypes.updateIn([liftTypeKey,'lastCompletedDate'],(lastCompletedDate:number) => {
+                            return Math.max(lastCompletedDate||0,workoutSummary.startDate||0) 
+                        });
+                    }
+                });
+            }
+        });
+
+        //Set each liftType's completed
+        Object.keys(liftTypes).forEach(liftTypeKey=>{
+            const liftType = liftTypes[liftTypeKey];
+            const workoutType = (liftType.workoutTypeKey && workoutTypes) ? workoutTypes[liftType.workoutTypeKey] : null;
+            let completed = false;
+            if(liftType.workoutTypeKey === 'wta'){
+            }
+            if(!newLiftTypes.get(liftTypeKey).get('lastCompletedDate')){
+                completed = false;
+            } else if(!workoutType || !workoutType.lastCompletedDate){
+                completed = true;
+            }else{
+                completed = newLiftTypes.get(liftTypeKey).get('lastCompletedDate') >= workoutType.lastCompletedDate;
+            }
+            newLiftTypes = newLiftTypes.setIn([liftTypeKey,'completed'],completed);
+        });
+    }
+    
+    return {
+        type:ActionTypeKeys.UPDATE_LIFT_TYPES,
+        liftTypes:newLiftTypes.toJS()
+    }
+}
+
 export interface workoutSummariesReceivedAction {
     type:ActionTypeKeys.WORKOUT_SUMMARIES_RECEIVED;
     workoutSummaries:{[key:string]:WorkoutSummary};
-    workoutTypes:{[key:string]:WorkoutType}
 }
 
 export function getWorkoutSummariesAsync(){
@@ -129,16 +179,17 @@ export function getWorkoutSummariesAsync(){
         }catch(error){
             console.log('error:',error);
         }
-        if(items)
-            dispatch(workoutSummariesReceived(items,state().workoutTypes));
+        if(items){
+            dispatch(workoutSummariesReceived(items));
+            dispatch(updateLiftTypes(state().liftTypes,items,state().workoutTypes,'',''));
+        }
     }
 }
 
-export function workoutSummariesReceived(workoutSummaries:{[key:string]:WorkoutSummary,},workoutTypes:{[key:string]:WorkoutType}):workoutSummariesReceivedAction {
+export function workoutSummariesReceived(workoutSummaries:{[key:string]:WorkoutSummary,}):workoutSummariesReceivedAction {
     return {
         type:ActionTypeKeys.WORKOUT_SUMMARIES_RECEIVED,
-        workoutSummaries,
-        workoutTypes
+        workoutSummaries
     }
 }
 
@@ -315,17 +366,13 @@ export interface deleteLiftAction {
     type:ActionTypeKeys.DELETE_LIFT;
     liftTypeKey:string;
     selectedWorkoutKey:string;
-    workoutSummaries:{[key:string]:WorkoutSummary};
-    workoutTypes:{[key:string]:WorkoutType};
 }
 
-export function deleteLift(liftTypeKey:string,selectedWorkoutKey:string, workoutSummaries:{[key:string]:WorkoutSummary},workoutTypes:{[key:string]:WorkoutType}): deleteLiftAction {
+export function deleteLift(liftTypeKey:string,selectedWorkoutKey:string): deleteLiftAction {
     return {
         type:ActionTypeKeys.DELETE_LIFT,
         liftTypeKey,
-        selectedWorkoutKey,
-        workoutSummaries,
-        workoutTypes
+        selectedWorkoutKey
     }
 }
 
@@ -333,10 +380,11 @@ export function deleteLiftAsync(liftTypeKey:string){
     return async (dispatch:any,state:()=>AppStateModel) => {
         const f = new FirebaseService();
         const selectedWorkoutKey = state().selectedWorkout.workout.key;
-        dispatch(deleteLift(liftTypeKey,selectedWorkoutKey, state().workoutSummaries,state().workoutTypes));
+        dispatch(deleteLift(liftTypeKey,selectedWorkoutKey));
+        dispatch(updateLiftTypes(state().liftTypes,state().workoutSummaries,state().workoutTypes,selectedWorkoutKey,liftTypeKey))
         try{
             let uid = state().user.uid;
-            const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
+            // const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
         }catch(error){
             console.log('error:',error);
         }
@@ -344,7 +392,7 @@ export function deleteLiftAsync(liftTypeKey:string){
     }
 }
 
-export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction|deleteSetAction|deleteLiftAction;
+export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction|deleteSetAction|deleteLiftAction|updateLiftTypesAction;
 
 export interface NavigateAction {
     type:ActionTypeKeys.NAVIGATE;
@@ -403,46 +451,3 @@ function generatePushID () {
 
     return id;
   };
-
-  const updateLiftTypes = (state:any,workoutSummaries:{[key:string]:WorkoutSummary},workoutTypes:{[key:string]:WorkoutType},workoutKey:string,deletedLiftTypeKey:string) => {
-    let newState = fromJS(state);
-    if(workoutSummaries){
-        if(deletedLiftTypeKey){
-            newState = newState.setIn([deletedLiftTypeKey,'lastCompletedDate'],0);
-        }
-
-        //Set each liftType's lastCompleted date
-        Object.keys(workoutSummaries).forEach(key=>{
-            const workoutSummary = workoutSummaries[key];
-            if(workoutSummary.liftTypeKeys){
-                workoutSummary.liftTypeKeys.forEach(liftTypeKey => {
-                    if(workoutSummary.id !== workoutKey || liftTypeKey !== deletedLiftTypeKey ){
-                        newState = newState.updateIn([liftTypeKey,'lastCompletedDate'],(lastCompletedDate:number) => {
-                            return Math.max(lastCompletedDate||0,workoutSummary.startDate||0) 
-                        });
-                    }
-                });
-            }
-        });
-
-        //Set each liftType's completed
-        const liftTypes = newState.toJS();
-        Object.keys(liftTypes).forEach(liftTypeKey=>{
-            const liftType = liftTypes[liftTypeKey];
-            const workoutType = workoutTypes ? workoutTypes[liftType.workoutTypeKey] : null;
-            let completed = false;
-            if(liftType.workoutTypeKey === 'wta'){
-                console.log('!!!!',liftType, workoutType);
-            }
-            if(!liftType.lastCompletedDate){
-                completed = false;
-            } else if(!workoutType || !workoutType.lastCompletedDate){
-                completed = true;
-            }else{
-                completed = liftType.lastCompletedDate >= workoutType.lastCompletedDate;
-            }
-            newState = newState.setIn([liftTypeKey,'completed'],completed);
-        });
-    }
-    return newState.toJS();
-}

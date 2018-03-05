@@ -6,4 +6,6 @@ interface LiftType {
 
     //computed
     active:boolean;
+    lastCompletedDate?:number;
+    completed?:boolean;
 }
