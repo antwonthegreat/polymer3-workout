@@ -14,7 +14,7 @@ declare module "d3-cloud" {
 }
 
 declare module "@polymer/polymer/polymer-element" {
-    export class Element extends HTMLElement {
+    export class PolymerElement extends HTMLElement {
         connectedCallback(): void;
         disconnectedCallback(): void;
         set(path:string,value:any): void;

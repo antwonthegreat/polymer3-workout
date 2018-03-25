@@ -22,4 +22,14 @@ const workoutTypeReducer = (state:any, action:ActionTypes) => {
     }
 };
 
+const workoutTypeSelector = (state:AppStateModel):Array<WorkoutType> => {
+    if(!state.workoutTypes)
+        return [];
+
+    return Object.keys(state.workoutTypes).map(key => {
+        return Object.assign({},state.workoutTypes[key],{key});
+    });
+}
+
 export {workoutTypeReducer};
+export {workoutTypeSelector};

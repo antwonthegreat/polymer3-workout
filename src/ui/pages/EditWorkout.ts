@@ -1,5 +1,5 @@
 import {appState} from "../../state/store";
-import {Element as PolymerElement} from "@polymer/polymer/polymer-element";
+import {PolymerElement} from "../../../node_modules/@polymer/polymer/polymer-element";
 import {connectToRedux, ReduxBindable} from "../util/ReduxConnector";
 import {workoutSummaryWithLiftNamesSelector} from "../../state/reducers/workout-summary-reducer";
 
@@ -13,6 +13,7 @@ import "../../../node_modules/@polymer/iron-pages/iron-pages.js";
 import "../../../node_modules/@polymer/paper-button/paper-button.js";
 import "../layout/LiftListItem";
 import "../layout/PaperPlates";
+import "./AddLift";
 import { WorkoutSetListItem } from "../layout/WorkoutSetListItem";
 
 const html = (template:any) => template.toString();
@@ -35,9 +36,6 @@ class EditWorkout extends PolymerElement implements ReduxBindable {
 
     @Property()
     page:string
-
-    @Property()
-    activeLiftTypes:Array<LiftType>;
 
     @Property()
     saveWeight = (weight:number)=>{
@@ -67,7 +65,6 @@ class EditWorkout extends PolymerElement implements ReduxBindable {
                     flex-direction:column;
                 }
             </style>
-            <paper-button on-click="_selectLiftToAdd">ADD<paper-button>
             <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="main">
                 <main name="main">
                     <workout-name>[[workout.name]]</workout-name>
@@ -77,14 +74,9 @@ class EditWorkout extends PolymerElement implements ReduxBindable {
                             <lift-list-item lift="[[lift]]" select-rep="[[selectRep]]" select-weight="[[selectWeight]]" delete-set="[[deleteSet]]" delete-lift="[[deleteLift]]"></lift-list-item>
                         </template>
                     </dom-repeat>
+                    <paper-button on-click="_selectLiftToAdd">ADD<paper-button>
                 </main>
-                <add-lift name="add">
-                    <dom-repeat items="[[activeLiftTypes]]" as="liftType" restamp>
-                        <template>
-                            <div>[[liftType.name]] [[liftType.completed]]</div>
-                        </template>
-                    </dom-repeat>
-                </add-lift>
+                <add-lift name="add"></add-lift>
                 <paper-plates name="rep" save-amount="[[saveReps]]" amount="[[selectedWorkoutSet.reps]]"  is-reps></paper-plates>
                 <paper-plates name="weight" save-amount="[[saveWeight]]" amount="[[selectedWorkoutSet.weight]]"></paper-plates>
             </iron-pages>
@@ -107,7 +99,6 @@ class EditWorkout extends PolymerElement implements ReduxBindable {
 
         this.selectedWorkoutSet = selectedWorkoutSetSelector(state);
         this.workout = selectedWorkoutSelector(state);
-        this.activeLiftTypes = activeLiftTypeSelector(state,'-KQvro6SI4DfN5RsGDd6');
     }
 
     _selectWeight(workoutSet:WorkoutSet,liftTypeKey:string){

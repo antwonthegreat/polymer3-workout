@@ -1,4 +1,4 @@
-import {Element as PolymerElement} from "@polymer/polymer/polymer-element";
+import {PolymerElement} from "../../../node_modules/@polymer/polymer/polymer-element";
 import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property-decorator";
 import "../../../node_modules/@polymer/iron-pages/iron-pages.js";
 import "../../../node_modules/@polymer/paper-tabs/paper-tabs.js";
@@ -342,8 +342,8 @@ class PaperPlates extends PolymerElement {
                     remainingBarbellWeight -= (plateToAdd * 2);
                 }
             }
-            this.set('barbellPlates', barbellPlates);
-            this.set('flippedBarbellPlates', barbellPlates.slice().reverse());
+            super.set('barbellPlates', barbellPlates);
+            super.set('flippedBarbellPlates', barbellPlates.slice().reverse());
 
             let remainingWeight = weight;
             plateAmountIndex = 0;
@@ -356,37 +356,37 @@ class PaperPlates extends PolymerElement {
                     remainingWeight -= plateToAdd;
                 }
             }
-            this.set('plates', plates.reverse());
+            super.set('plates', plates.reverse());
         }
     }
 
     addPlate(e:any) {
         let plateAmount: number = e.model.item;
-        this.set('amount', this.amount * 1 + plateAmount);
+        super.set('amount', this.amount * 1 + plateAmount);
         this.hasChanges = true;
     }
 
     removePlate(e:any) {
         let weight = e.model.item;
-        this.set('amount', this.amount * 1 - weight);
+        super.set('amount', this.amount * 1 - weight);
         this.hasChanges = true;
     }
 
     addBarbellPlate(e:any) {
         let plateAmount: number = e.model.item;
-        this.set('amount', Math.max(this.amount * 1 + plateAmount * 2, this.barbellWeight * 1 + plateAmount * 2));
+        super.set('amount', Math.max(this.amount * 1 + plateAmount * 2, this.barbellWeight * 1 + plateAmount * 2));
         this.hasChanges = true;
     }
 
     removeBarbellPlate(e:any) {
         let weight = e.model.item;
-        this.set('amount', this.amount * 1 - weight * 2);
+        super.set('amount', this.amount * 1 - weight * 2);
         this.hasChanges = true;
     }
 
     addDigit(e:any) {
         let digit = e.currentTarget.getAttribute('value');
-        this.set('amount', Number((this.amount || '').toString() + digit));
+        super.set('amount', Number((this.amount || '').toString() + digit));
         this.hasChanges = true;
     }
 
@@ -395,12 +395,12 @@ class PaperPlates extends PolymerElement {
     }
 
     increment() {
-        this.set('amount', parseInt(this.amount.toString() || '0', 10) + 5);
+        super.set('amount', parseInt(this.amount.toString() || '0', 10) + 5);
         this.hasChanges = true;
     }
 
     decrement() {
-        this.set('amount', Math.max(parseInt(this.amount.toString() || '0', 10) - 5, 0));
+        super.set('amount', Math.max(parseInt(this.amount.toString() || '0', 10) - 5, 0));
         this.hasChanges = true;
     }
 
@@ -409,12 +409,12 @@ class PaperPlates extends PolymerElement {
             return;
         let amount = this.amount.toString();
         amount = amount.substr(0, amount.length - 1);
-        this.set('amount', parseInt(amount, 10) || null);
+        super.set('amount', parseInt(amount, 10) || null);
         this.hasChanges = true;
     }
 
     open() {
-        this.$.dialog.open();
+        super.$.dialog.open();
     }
 
     connectedCallback() {

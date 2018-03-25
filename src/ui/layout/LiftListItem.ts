@@ -1,5 +1,5 @@
 /// <reference path="../../model/Lift.ts" />
-import {Element as PolymerElement} from "@polymer/polymer/polymer-element";
+import {PolymerElement} from "../../../node_modules/@polymer/polymer/polymer-element";
 import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property-decorator";
 import "../../../node_modules/@polymer/iron-icon/iron-icon.js";
 import "../../../node_modules/@polymer/paper-icon-button/paper-icon-button.js";

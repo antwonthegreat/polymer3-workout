@@ -1,7 +1,8 @@
 /// <reference path="../../model/WorkoutSet.ts" />
-import {Element as PolymerElement} from "@polymer/polymer/polymer-element";
+import {PolymerElement} from "../../../node_modules/@polymer/polymer/polymer-element";
 import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property-decorator";
 import Observe from "../../../node_modules/@leavittsoftware/polymer-ts/observe-decorator";
+
 
 const html = (template:any) => template.toString();
 

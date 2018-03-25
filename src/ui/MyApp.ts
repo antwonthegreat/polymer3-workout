@@ -1,5 +1,7 @@
+/// <reference path="../custom-types.d.ts"/>
+
 import {appState} from "../state/store";
-import {Element as PolymerElement} from "@polymer/polymer/polymer-element";
+import {PolymerElement} from "../../node_modules/@polymer/polymer/polymer-element";
 import {connectToRedux, ReduxBindable} from "./util/ReduxConnector";
 import {navigate, signInIfNeeded, getWorkoutTypesAsync,getLiftTypesAsync, getWorkoutSummariesAsync} from '../state/actions/Actions.js';
 import {workoutSummaryWithLiftNamesSelector} from '../state/reducers/workout-summary-reducer'
@@ -15,6 +17,10 @@ import "../ui/pages/WorkoutList";
 import "../ui/pages/EditWorkout";
 
 const html = (template:any) => template.toString();
+
+interface PolymerElement {
+    set:any
+}
 
 class MyApp extends PolymerElement implements ReduxBindable {
     @Property()
@@ -63,7 +69,7 @@ class MyApp extends PolymerElement implements ReduxBindable {
 
     stateReceiver(state:any) {
         if(state.navigation.route !== this.route.path){
-            this.set('route.path', state.navigation.route);
+            super.set('route.path', state.navigation.route);
         }
         if(state.user.uid){
             this.uid = state.user.uid;
