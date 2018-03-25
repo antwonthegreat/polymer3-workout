@@ -11,7 +11,7 @@ module.exports = {
         port: 7002,
         inline: true,
         noInfo: false,
-        host: '0.0.0.0',
+        host: 'localhost',
         disableHostCheck: true
     },
 
@@ -26,9 +26,9 @@ module.exports = {
             use: ['raw-loader']
         }, {
             test: /(\.ts(x?)$)/,
-            exclude:/test/,
+            exclude: /test/,
             use: [
-                {loader: 'ts-loader'}
+                { loader: 'ts-loader' }
             ]
         }, {
             test: /\.(gif|png|jpe?g)$/i,

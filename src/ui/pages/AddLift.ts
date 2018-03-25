@@ -36,13 +36,15 @@ class AddLift extends PolymerElement implements ReduxBindable {
             <style>
                 
             </style>
-                    <paper-listbox id="s" slot="dropdown-content" class="dropdown-content" selected="{{workoutTypeKey}}" attr-for-selected="value">
-                        <dom-repeat items="[[workoutTypes]]">
-                            <template>
-                                <paper-item value="[[item.key]]">[[item.name]]</paper-item>
-                            </template>
-                        </dom-repeat>
-                    </paper-listbox>
+            <paper-dropdown-menu no-animations label="Muscle Group">
+                <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{workoutTypeKey}}" attr-for-selected="value">
+                    <dom-repeat items="[[workoutTypes]]">
+                        <template>
+                            <paper-item value="[[item.key]]">[[item.name]]</paper-item>
+                        </template>
+                    </dom-repeat>
+                </paper-listbox>
+            </paper-dropdown-menu>
         `
     }
 
