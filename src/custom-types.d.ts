@@ -18,7 +18,7 @@ declare module "@polymer/polymer/polymer-element" {
         connectedCallback(): void;
         disconnectedCallback(): void;
         set(path:string,value:any): void;
-        $:any;
+        $: any;
     }
 }
 

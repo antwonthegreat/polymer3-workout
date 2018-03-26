@@ -9,12 +9,17 @@
     "noImplicitAny": true,
     "sourceMap": false,
     "allowJs": true,
-    "lib": ["es2017", "dom"],
-    "typeRoots": ["types"]
+    "lib": [
+      "es2017",
+      "dom"
+    ],
+    "typeRoots": [
+      "types"
+    ]
   },
-  "exclude": [    
+  "exclude": [
     "node_modules/**/*",
     "webpack.config.js",
-    "test/**/*"
+    // "test/**/*"
   ]
 }

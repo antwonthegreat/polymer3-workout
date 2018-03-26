@@ -4,6 +4,7 @@ import {connectToRedux, ReduxBindable} from "../util/ReduxConnector";
 import {workoutSummaryWithLiftNamesSelector} from "../../state/reducers/workout-summary-reducer";
 
 import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property-decorator";
+import Listen from "../../../node_modules/@leavittsoftware/polymer-ts/listen-decorator";
 import "../layout/WorkoutSummaryListItem";
 import { selectWorkoutAsync, selectWeight,selectRep, updateSelectedWorkoutSetWeightAsync, updateSelectedWorkoutSetRepsAsync, deleteSetAsync, deleteLiftAsync } from "../../state/actions/Actions";
 import { selectedWorkoutSelector,selectedWorkoutSetSelector } from "../../state/reducers/selected-workout-reducer";
@@ -112,6 +113,17 @@ class EditWorkout extends PolymerElement implements ReduxBindable {
     @Observe('workoutId')
     workoutIdChanged(workoutId:string){
         appState.dispatch(selectWorkoutAsync(workoutId));
+    }
+
+    @Listen('add-lift-canceled')
+    protected addLiftCanceled() {
+        this.page = 'main';
+
+    }    
+
+    @Listen('lift-added')
+    protected liftAdded() {
+        this.page = 'main';
     }
 
     protected _selectLiftToAdd(){

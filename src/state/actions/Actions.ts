@@ -392,6 +392,14 @@ export function deleteLiftAsync(liftTypeKey:string){
     }
 }
 
+export function addLift(liftTypeKey:string): any {
+    return {
+        // type:ActionTypeKeys.DELETE_LIFT,
+        // liftTypeKey,
+        // selectedWorkoutKey
+    }
+}
+
 export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction|deleteSetAction|deleteLiftAction|updateLiftTypesAction;
 
 export interface NavigateAction {

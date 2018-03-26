@@ -26,7 +26,7 @@ const activeLiftTypeSelector = (state:AppStateModel, workoutTypeKey:string):Arra
         return [];
 
     return Object.keys(state.liftTypes).filter(key => {
-        return state.liftTypes[key] && state.liftTypes[key].active && state.liftTypes[key].workoutTypeKey === workoutTypeKey;
+        return state.liftTypes[key] && state.liftTypes[key].active && state.liftTypes[key].workoutTypeKey === workoutTypeKey && !state.selectedWorkout.workout.lifts.some(lift => lift.liftTypeKey === key);
     }).map(key => {
         return state.liftTypes[key];
     }).sort((a,b)=>{

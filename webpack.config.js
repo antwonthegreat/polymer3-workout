@@ -11,7 +11,7 @@ module.exports = {
         port: 7002,
         inline: true,
         noInfo: false,
-        host: 'localhost',
+        host: '127.0.0.1',
         disableHostCheck: true
     },
 
