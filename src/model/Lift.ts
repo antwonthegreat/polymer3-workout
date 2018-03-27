@@ -3,7 +3,7 @@ interface Lift {
     sets:Array<WorkoutSet>;
 
     //computed
-    name:string;
+    name?:string;
     liftType?:LiftType;
     weightLabel?:string;
     repLabel?:string;

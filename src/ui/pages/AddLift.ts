@@ -10,7 +10,7 @@ import {appState} from "../../state/store";
 import {connectToRedux, ReduxBindable} from "../util/ReduxConnector";
 import { activeLiftTypeSelector } from "../../state/reducers/lift-type-reducer";
 import { workoutTypeSelector } from "../../state/reducers/workout-type-reducer";
-// import {  } from "../../state/actions/Actions";
+import { addLiftAsync } from "../../state/actions/Actions";
 
 import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property-decorator";
 import Observe from "../../../node_modules/@leavittsoftware/polymer-ts/observe-decorator";
@@ -92,6 +92,9 @@ class AddLift extends PolymerElement implements ReduxBindable {
     stateReceiver(state: any) {
         this.state = state;
         this.workoutTypes = workoutTypeSelector(state);
+        if (this.workoutTypeKey) {
+            this.activeLiftTypes = activeLiftTypeSelector(this.state, this.workoutTypeKey);
+        }    
     }
 
     protected _cancel() {
@@ -100,7 +103,7 @@ class AddLift extends PolymerElement implements ReduxBindable {
 
     protected _add() {
         if (this.liftTypeKey) {
-            // appState.dispatch();
+            appState.dispatch(addLiftAsync(this.liftTypeKey,new Date()));
         }
         (this as any).dispatchEvent(new CustomEvent('lift-added', {composed: true, bubbles: true} as any));
     }

@@ -69,6 +69,12 @@ const selectedWorkoutReducer = (state:AppStateModel['selectedWorkout'] = initial
             const liftIndex = state.workout.lifts.indexOf(lift);
             return fromJS(state).updateIn(['workout','lifts'],(list:any) => list.splice(liftIndex,1)).toJS();
         }
+        case ActionTypeKeys.ADD_LIFT: {
+            if (!state.workout.lifts)
+                return state;
+            
+            return fromJS(state).updateIn(['workout','lifts'],(list:any) => list.push(action.lift)).toJS();
+        }    
         default:
             return state || initialState.toJS();
     }

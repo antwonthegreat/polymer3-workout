@@ -234,13 +234,14 @@ describe('selected-workout-reducer', ()=>{
             }
         };
 
-        const nextState = reducer(initialState,addLift('liftTypeKey'));
+        const nextState = reducer(initialState,addLift('liftTypeKey','selectedWorkout',new Date(123)));
 
         expect(nextState.selectedWorkout.workout.lifts.length).to.equal(3);
         expect(nextState.selectedWorkout.workout.lifts[2].liftTypeKey).to.equal('liftTypeKey');
-        expect(nextState.selectedWorkout.workout.lifts[2].orderStartDate).to.equal(-nextState.selectedWorkout.workout.lifts[2].startDate);
-        expect(nextState.selectedWorkout.workout.lifts[2].sets).to.equal([]);
-        expect(nextState.selectedWorkout.workout.lifts[2].workoutKey).to.equal('e');
+        expect(nextState.selectedWorkout.workout.lifts[2].orderStartDate).to.equal(-123);
+        expect(nextState.selectedWorkout.workout.lifts[2].startDate).to.equal(123);
+        expect(nextState.selectedWorkout.workout.lifts[2].sets.length).to.equal(0);
+        expect(nextState.selectedWorkout.workout.lifts[2].workoutKey).to.equal('selectedWorkout');
     });
 
     it('selectedWorkoutSelector returns null if no selectedWorkout',()=>{

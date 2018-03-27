@@ -93,7 +93,7 @@ describe('workout-summary-reducer', ()=>{
             }
         };
 
-        const nextState = reducer(initialState,addLift('liftTypeKey'));
+        const nextState = reducer(initialState,addLift('liftTypeKey','selectedWorkout',new Date(123)));
         expect(nextState.workoutSummaries.w.liftTypeKeys.length).to.equal(2);
         expect(nextState.workoutSummaries.selectedWorkout.liftTypeKeys.length).to.equal(3);
         expect(nextState.workoutSummaries.selectedWorkout.liftTypeKeys[2]).to.equal('liftTypeKey');

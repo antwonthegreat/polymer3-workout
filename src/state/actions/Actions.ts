@@ -25,6 +25,7 @@ export enum ActionTypeKeys {
     UPDATE_SELECTED_WORKOUTSET_REPS = 'UPDATE_SELECTED_WORKOUTSET_REPS',
     DELETE_SET = 'DELETE_SET',
     DELETE_LIFT = 'DELETE_LIFT',
+    ADD_LIFT = 'ADD_LIFT',
 
     SIGNED_IN = 'SIGNED_IN',
     OTHER_ACTION = '__any_other_action_type__'
@@ -392,15 +393,45 @@ export function deleteLiftAsync(liftTypeKey:string){
     }
 }
 
-export function addLift(liftTypeKey:string): any {
+export interface addLiftAction {
+    type:ActionTypeKeys.ADD_LIFT;
+    lift: Lift;
+    selectedWorkoutKey:string;
+}
+
+export function addLift(liftTypeKey: string, selectedWorkoutKey: string, startDate:Date): addLiftAction {
+    const lift = {
+        liftTypeKey,
+        sets: [],
+        startDate:startDate.getTime(),
+        orderStartDate: -startDate.getTime(),
+        workoutKey:selectedWorkoutKey
+    };
     return {
-        // type:ActionTypeKeys.DELETE_LIFT,
-        // liftTypeKey,
-        // selectedWorkoutKey
+        type:ActionTypeKeys.ADD_LIFT,
+        lift,
+        selectedWorkoutKey
     }
 }
 
-export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction|deleteSetAction|deleteLiftAction|updateLiftTypesAction;
+export function addLiftAsync(liftTypeKey:string,startDate:Date){
+    return async (dispatch:any,state:()=>AppStateModel) => {
+        const f = new FirebaseService();
+        const selectedWorkoutKey = state().selectedWorkout.workout.key;
+        dispatch(addLift(liftTypeKey, selectedWorkoutKey, startDate));
+        console.log('added');
+        dispatch(updateLiftTypes(state().liftTypes,state().workoutSummaries,state().workoutTypes,selectedWorkoutKey,liftTypeKey))
+        try{
+            let uid = state().user.uid;
+            // const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
+        }catch(error){
+            console.log('error:',error);
+        }
+        dispatch(selectedWorkoutUpdated());
+    }
+}
+
+export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction|deleteSetAction|deleteLiftAction|updateLiftTypesAction|addLiftAction;
 
 export interface NavigateAction {
     type:ActionTypeKeys.NAVIGATE;
