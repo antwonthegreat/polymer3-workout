@@ -4,6 +4,7 @@ import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property
 import "../../../node_modules/@polymer/iron-icon/iron-icon.js";
 import "../../../node_modules/@polymer/paper-icon-button/paper-icon-button.js";
 import "../../../node_modules/@polymer/iron-iconset-svg/iron-iconset-svg.js";
+import "../../../node_modules/@polymer/paper-button/paper-button.js";
 import "./WorkoutSetListItem";
 
 const html = (template:any) => template.toString();
@@ -63,6 +64,7 @@ class LiftListItem extends PolymerElement {
                         <workout-set-list-item workout-set="[[workoutSet]]" lift-type-key="[[lift.liftTypeKey]]" select-weight="[[selectWeight]]" select-rep="[[selectRep]]" delete-set="[[deleteSet]]"></workout-set-list-item>
                     </template>
                 </dom-repeat>
+                <paper-button on-click="_addSet">Add Set</paper-button>
             </lift-body>
         `
     }
@@ -73,6 +75,10 @@ class LiftListItem extends PolymerElement {
 
     private _deleteLift(){
         this.deleteLift(this.lift.liftTypeKey);
+    }
+
+    protected _addSet() {
+        (this as any).dispatchEvent(new CustomEvent('add-set', {composed: true, bubbles: true, detail: {liftTypeKey:this.lift.liftTypeKey}} as any));
     }
 }
 

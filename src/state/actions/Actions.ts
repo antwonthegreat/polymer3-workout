@@ -26,6 +26,7 @@ export enum ActionTypeKeys {
     DELETE_SET = 'DELETE_SET',
     DELETE_LIFT = 'DELETE_LIFT',
     ADD_LIFT = 'ADD_LIFT',
+    ADD_SET = 'ADD_SET',
 
     SIGNED_IN = 'SIGNED_IN',
     OTHER_ACTION = '__any_other_action_type__'
@@ -431,7 +432,40 @@ export function addLiftAsync(liftTypeKey:string,startDate:Date){
     }
 }
 
-export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction|deleteSetAction|deleteLiftAction|updateLiftTypesAction|addLiftAction;
+export interface addSetAction {
+    type:ActionTypeKeys.ADD_SET;
+    liftTypeKey: string;
+    setKey: string;
+}
+
+export function addSet(liftTypeKey: string): addSetAction {
+    return {
+        type:ActionTypeKeys.ADD_SET,
+        liftTypeKey,
+        setKey: generatePushID()
+    }
+}
+
+export function addSetAsync(liftTypeKey:string){
+    return async (dispatch: any, state: () => AppStateModel) => {
+        const f = new FirebaseService();
+        let uid = state().user.uid;
+        try{
+            const personalBest = await f.getAsync(`/users/${uid}/best-by-weight/${liftTypeKey}`, undefined, undefined, undefined, 1);
+            console.log('personalBest', personalBest);
+        }catch(error){
+            console.log('error:',error);
+        }
+        dispatch(addSet(liftTypeKey));
+        try{
+            // const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
+        }catch(error){
+            console.log('error:',error);
+        }
+    }
+}
+
+export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction|deleteSetAction|deleteLiftAction|updateLiftTypesAction|addLiftAction|addSetAction;
 
 export interface NavigateAction {
     type:ActionTypeKeys.NAVIGATE;

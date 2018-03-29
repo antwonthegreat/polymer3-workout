@@ -2,7 +2,7 @@
 
 import {expect} from 'chai';
 import {reducer} from '../src/state/reducers/reducer.js';
-import {selectedWorkoutCleared,selectedWorkoutReceived,selectWeight,selectRep,updateSelectedWorkoutSetWeight,updateSelectedWorkoutSetReps, deleteSet, deleteLift, addLift} from '../src/state/actions/Actions.js';
+import {selectedWorkoutCleared,selectedWorkoutReceived,selectWeight,selectRep,updateSelectedWorkoutSetWeight,updateSelectedWorkoutSetReps, deleteSet, deleteLift, addLift, addSet} from '../src/state/actions/Actions.js';
 import {selectedWorkoutSelector,selectedWorkoutSetSelector} from '../src/state/reducers/selected-workout-reducer';
 
 describe('selected-workout-reducer', ()=>{
@@ -242,6 +242,28 @@ describe('selected-workout-reducer', ()=>{
         expect(nextState.selectedWorkout.workout.lifts[2].startDate).to.equal(123);
         expect(nextState.selectedWorkout.workout.lifts[2].sets.length).to.equal(0);
         expect(nextState.selectedWorkout.workout.lifts[2].workoutKey).to.equal('selectedWorkout');
+    });
+
+    it('addSet pushes new set onto selectedWorkout on correct lift',()=>{
+        const workoutSet = {key:'a',reps:1,weight:1};
+        const selectedWorkoutSet = {key:'b',reps:1,weight:1};
+        const lift = {liftTypeKey:'c',sets:[workoutSet,selectedWorkoutSet]};
+        const lift2 = {liftTypeKey:'d',sets:[workoutSet,selectedWorkoutSet]};
+        const workout = {key:'e',lifts:[lift,lift2],name:'a',orderStartDate:1,startDate:1,id:'1'};
+        const initialState = {
+            selectedWorkout:{
+                workout:workout,
+                liftTypeKey:'d',
+                workoutSet:selectedWorkoutSet,
+                editMode:'weight'
+            }
+        };
+
+        const nextState = reducer(initialState,addSet('d'));
+
+        expect(nextState.selectedWorkout.workout.lifts.length).to.equal(2);
+        expect(nextState.selectedWorkout.workout.lifts[0].sets.length).to.equal(2);
+        expect(nextState.selectedWorkout.workout.lifts[1].sets.length).to.equal(3);
     });
 
     it('selectedWorkoutSelector returns null if no selectedWorkout',()=>{
