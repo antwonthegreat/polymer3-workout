@@ -4,7 +4,7 @@ import {connectToRedux, ReduxBindable} from "../util/ReduxConnector";
 import {workoutSummaryWithLiftNamesSelector} from "../../state/reducers/workout-summary-reducer";
 
 import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property-decorator";
-import "../layout/WorkoutSummaryListItem";
+
 import { navigate } from "../../state/actions/Actions";
 import * as moment from "../../../node_modules/moment/moment";
 
@@ -60,10 +60,11 @@ class WorkoutList extends PolymerElement implements ReduxBindable {
         appState.dispatch(navigate(`/edit-workout/${this.userId}/${workoutSummary.id}/`))
     }
 
-    connectedCallback() {
+    async connectedCallback() {
         super.connectedCallback();
         this.IOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
         connectToRedux(this);
+        await import("../layout/WorkoutSummaryListItem");
     }
 
     formatDate(date:string){
