@@ -10,7 +10,7 @@ import AppStateModel from "../../model/AppStateModel";
 import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property-decorator";
 import Listen from "../../../node_modules/@leavittsoftware/polymer-ts/listen-decorator";
 import "../layout/WorkoutSummaryListItem";
-import { selectWorkoutAsync, selectWeight,selectRep, updateSelectedWorkoutSetWeightAsync, updateSelectedWorkoutSetRepsAsync, deleteSetAsync, deleteLiftAsync, addSetAsync } from "../../state/actions/Actions";
+import { selectWorkoutAsync, selectWeight,selectRep, updateSelectedWorkoutSetWeightAsync, updateSelectedWorkoutSetRepsAsync, deleteSetAsync, deleteLiftAsync, addSetAsync, clearSelectedLift } from "../../state/actions/Actions";
 import { selectedWorkoutSelector,selectedWorkoutSetSelector } from "../../state/reducers/selected-workout-reducer";
 import { activeLiftTypeSelector } from "../../state/reducers/lift-type-reducer";
 import Observe from "../../../node_modules/@leavittsoftware/polymer-ts/observe-decorator";
@@ -53,6 +53,11 @@ class EditWorkout extends PolymerElement implements ReduxBindable {
     }
 
     @Property()
+    cancel = ()=>{
+        appState.dispatch(clearSelectedLift());
+    }
+
+    @Property()
     deleteSet = (key:string,liftTypeKey:string)=>{
         appState.dispatch(deleteSetAsync(key,liftTypeKey));
     };
@@ -82,8 +87,8 @@ class EditWorkout extends PolymerElement implements ReduxBindable {
                     <paper-button on-click="_selectLiftToAdd">ADD<paper-button>
                 </main>
                 <add-lift name="add"></add-lift>
-                <paper-plates name="rep" save-amount="[[saveReps]]" amount="[[selectedWorkoutSet.reps]]"  is-reps></paper-plates>
-                <paper-plates name="weight" save-amount="[[saveWeight]]" amount="[[selectedWorkoutSet.weight]]"></paper-plates>
+                <paper-plates name="rep" save-amount="[[saveReps]]" cancel="[[cancel]]" amount="[[selectedWorkoutSet.reps]]"  is-reps></paper-plates>
+                <paper-plates name="weight" save-amount="[[saveWeight]]" cancel="[[cancel]]" amount="[[selectedWorkoutSet.weight]]"></paper-plates>
             </iron-pages>
         `
     }

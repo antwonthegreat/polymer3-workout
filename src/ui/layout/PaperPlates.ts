@@ -56,7 +56,10 @@ class PaperPlates extends PolymerElement {
     hasChanges: boolean;
 
     @Property()
-    saveAmount:(amount:number)=>{};
+    saveAmount: (amount: number) => {};
+    
+    @Property()
+    cancel: () => {};
 
     static get template() {
         return html`
@@ -326,7 +329,7 @@ class PaperPlates extends PolymerElement {
             this.saveAmount(this.amount);
         }
         this.hasChanges = false;
-        //TODO:exit paper-plates without saving
+        this.cancel();
     }
 
     @Observe('amount')
