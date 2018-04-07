@@ -1,4 +1,4 @@
-interface WorkoutSummary {
+export default interface WorkoutSummary {
     liftTypeKeys:Array<string>;
     name:string;
     orderStartDate:number;

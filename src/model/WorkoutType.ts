@@ -1,6 +1,7 @@
-interface WorkoutType {
-    users:{[key:string]:Partial<firebase.User>};
+export default interface WorkoutType {
+    users?:{[key:string]:{startDate?:number}};
 
     //computed
-    active:boolean;
+    active?:boolean;
+    lastCompletedDate?:number;
 }

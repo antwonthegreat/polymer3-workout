@@ -1,7 +1,10 @@
-/// <reference path="../actions/Actions.ts" />
 import {Map, List, fromJS} from 'immutable';
 
 import {ActionTypes,ActionTypeKeys} from '../actions/Actions';
+
+import WorkoutSet from "../../model/WorkoutSet";
+import Workout from "../../model/Workout";
+import AppStateModel from "../../model/AppStateModel";
 
 const initialState = Map({});
 
@@ -69,6 +72,21 @@ const selectedWorkoutReducer = (state:AppStateModel['selectedWorkout'] = initial
             const liftIndex = state.workout.lifts.indexOf(lift);
             return fromJS(state).updateIn(['workout','lifts'],(list:any) => list.splice(liftIndex,1)).toJS();
         }
+        case ActionTypeKeys.ADD_LIFT: {
+            if (!state.workout.lifts)
+                return state;
+            
+            return fromJS(state).updateIn(['workout','lifts'],(list:any) => list.push(action.lift)).toJS();
+        }
+        case ActionTypeKeys.ADD_SET: {
+            const lift = state && state.workout && state.workout.lifts && state.workout.lifts.filter(lift => lift.liftTypeKey === action.liftTypeKey)[0];
+            if(!lift)
+                return state;
+
+            const liftIndex = state.workout.lifts.indexOf(lift);
+            
+            return fromJS(state).updateIn(['workout', 'lifts', liftIndex, 'sets'], (list: any) => list.push({key:action.setKey,reps:0,weight:0})).toJS();
+        }    
         default:
             return state || initialState.toJS();
     }

@@ -1,13 +1,15 @@
-/// <reference path="../actions/Actions.ts" />
 import {Map, fromJS} from 'immutable';
 
 import {ActionTypes,ActionTypeKeys} from '../actions/Actions';
+
+import AppStateModel from "../../model/AppStateModel";
+
 
 const initialState = Map({});
 
 const workoutSummaryReducer = (state:AppStateModel['workoutSummaries'] = initialState.toJS(), action:ActionTypes) => {
     switch (action.type) {
-        case ActionTypeKeys.WORKOUT_SUMMARIES_RECEIVED: { 
+        case ActionTypeKeys.WORKOUT_SUMMARIES_RECEIVED: {
             return action.workoutSummaries;
         }
         case ActionTypeKeys.DELETE_LIFT: {
@@ -22,6 +24,16 @@ const workoutSummaryReducer = (state:AppStateModel['workoutSummaries'] = initial
 
             return fromJS(state).updateIn([action.selectedWorkoutKey,'liftTypeKeys'],(list:any) => list.splice(liftTypeKeyIndex,1)).toJS();
         }
+        case ActionTypeKeys.ADD_LIFT: {
+            if(!action.selectedWorkoutKey)
+                return state;
+
+            const liftTypeKey = state[action.selectedWorkoutKey] && state[action.selectedWorkoutKey].liftTypeKeys.filter(liftTypeKey => liftTypeKey === action.lift.liftTypeKey)[0];
+            if (liftTypeKey || !state[action.selectedWorkoutKey] || !state[action.selectedWorkoutKey].liftTypeKeys)
+                return state;
+
+            return fromJS(state).updateIn([action.selectedWorkoutKey,'liftTypeKeys'],(list:any) => list.push(action.lift.liftTypeKey)).toJS();
+        }    
         default:
             return state || initialState.toJS();
     }

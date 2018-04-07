@@ -1,5 +1,5 @@
 /// <reference path="../../node_modules/firebase/index.d.ts" />
-import * as firebase from "firebase";
+import * as firebase from "../../node_modules/firebase/index"; 
 
 const config = {
     apiKey: "AIzaSyAO0R8DFOkI29Slh1ucfZ8kIhFh1MWy06Y",

@@ -1,16 +1,20 @@
-/// <reference path="../../model/WorkoutType.ts" />
-/// <reference path="../../model/LiftType.ts" />
-/// <reference path="../../model/WorkoutSummary.ts" />
-/// <reference path="../../model/Workout.ts" />
-/// <reference path="../../model/AppStateModel.ts" />
-/// <reference path="../../../node_modules/firebase/index.d.ts" />
+import WorkoutType from "../../model/WorkoutType";
+import LiftType from "../../model/LiftType";
+import Lift from "../../model/Lift";
+import WorkoutSet from "../../model/WorkoutSet";
+import WorkoutSummary from "../../model/WorkoutSummary";
+import Workout from "../../model/Workout";
+import AppStateModel from "../../model/AppStateModel";
+import { User } from "../../../node_modules/firebase/index"
 
 import {FirebaseService} from "../../services/FirebaseService";
+import {Map, fromJS} from 'immutable';
 
 export enum ActionTypeKeys {
     NAVIGATE = 'NAVIGATE',
     WORKOUT_TYPES_RECEIVED = 'WORKOUT_TYPES_RECEIVED',
     LIFT_TYPES_RECEIVED = 'LIFT_TYPES_RECEIVED',
+    UPDATE_LIFT_TYPES = 'UPDATE_LIFT_TYPES',
     WORKOUT_SUMMARIES_RECEIVED = 'WORKOUT_SUMMARIES_RECEIVED',
     SELECTED_WORKOUT_RECEIVED = 'SELECTED_WORKOUT_RECEIVED',
     CLEAR_SELECTED_WORKOUT = 'CLEAR_SELECTED_WORKOUT',
@@ -23,6 +27,8 @@ export enum ActionTypeKeys {
     UPDATE_SELECTED_WORKOUTSET_REPS = 'UPDATE_SELECTED_WORKOUTSET_REPS',
     DELETE_SET = 'DELETE_SET',
     DELETE_LIFT = 'DELETE_LIFT',
+    ADD_LIFT = 'ADD_LIFT',
+    ADD_SET = 'ADD_SET',
 
     SIGNED_IN = 'SIGNED_IN',
     OTHER_ACTION = '__any_other_action_type__'
@@ -34,7 +40,7 @@ export interface OtherAction {
 
 export interface SignedInAction {
     type:ActionTypeKeys.SIGNED_IN;
-    user:any;
+    user:User;
 }
 
 export function signInIfNeeded() {
@@ -59,7 +65,7 @@ function signedIn(user:any):SignedInAction {
 export interface workoutTypesReceivedAction {
     type:ActionTypeKeys.WORKOUT_TYPES_RECEIVED;
     workoutTypes:{[key:string]:WorkoutType},
-    user:Partial<firebase.User>
+    user:Partial<User>
 }
 
 export function getWorkoutTypesAsync(){
@@ -76,7 +82,7 @@ export function getWorkoutTypesAsync(){
     }
 }
 
-export function workoutTypesReceived(workoutTypes:{[key:string]:WorkoutType},user:Partial<firebase.User>):workoutTypesReceivedAction {
+export function workoutTypesReceived(workoutTypes:{[key:string]:WorkoutType},user:Partial<User>):workoutTypesReceivedAction {
     return {
         type:ActionTypeKeys.WORKOUT_TYPES_RECEIVED,
         workoutTypes,
@@ -87,7 +93,7 @@ export function workoutTypesReceived(workoutTypes:{[key:string]:WorkoutType},use
 export interface liftTypesReceivedAction {
     type:ActionTypeKeys.LIFT_TYPES_RECEIVED;
     liftTypes:{[key:string]:LiftType},
-    user:Partial<firebase.User>
+    user:Partial<User>
 }
 
 export function getLiftTypesAsync(){
@@ -95,7 +101,7 @@ export function getLiftTypesAsync(){
         const f = new FirebaseService();
         let liftTypes;
         try{
-            liftTypes = await f.getAsync<LiftType>('/lift-types');
+            liftTypes = await f.getAsync<LiftType>('/lift-types',undefined,'name');
         }catch(error){
             console.log('error:',error);
         }
@@ -104,7 +110,7 @@ export function getLiftTypesAsync(){
     }
 }
 
-export function liftTypesReceived(liftTypes:{[key:string]:LiftType},user:Partial<firebase.User>):liftTypesReceivedAction {
+export function liftTypesReceived(liftTypes:{[key:string]:LiftType},user:Partial<User>):liftTypesReceivedAction {
     return {
         type:ActionTypeKeys.LIFT_TYPES_RECEIVED,
         liftTypes,
@@ -112,9 +118,59 @@ export function liftTypesReceived(liftTypes:{[key:string]:LiftType},user:Partial
     }
 }
 
+export interface updateLiftTypesAction {
+    type:ActionTypeKeys.UPDATE_LIFT_TYPES;
+    liftTypes:{[key:string]:LiftType}
+}
+
+export function updateLiftTypes (liftTypes:{[key:string]:Partial<LiftType>},workoutSummaries:{[key:string]:WorkoutSummary},workoutTypes:{[key:string]:WorkoutType},workoutKey:string|null,deletedLiftTypeKey:string|null) : updateLiftTypesAction  {
+    let newLiftTypes = fromJS(liftTypes);
+    if(workoutSummaries){
+        if(deletedLiftTypeKey){
+            newLiftTypes = newLiftTypes.setIn([deletedLiftTypeKey,'lastCompletedDate'],0);
+        }
+
+        //Set each liftType's lastCompleted date
+        Object.keys(workoutSummaries).forEach(key=>{
+            const workoutSummary = workoutSummaries[key];
+            if(workoutSummary.liftTypeKeys){
+                workoutSummary.liftTypeKeys.forEach(liftTypeKey => {
+                    if(workoutSummary.id !== workoutKey || liftTypeKey !== deletedLiftTypeKey ){
+                        newLiftTypes = newLiftTypes.updateIn([liftTypeKey,'lastCompletedDate'],(lastCompletedDate:number) => {
+                            return Math.max(lastCompletedDate||0,workoutSummary.startDate||0) 
+                        });
+                    }
+                });
+            }
+        });
+
+        //Set each liftType's completed
+        Object.keys(liftTypes).forEach(liftTypeKey=>{
+            const liftType = liftTypes[liftTypeKey];
+            const workoutType = (liftType.workoutTypeKey && workoutTypes) ? workoutTypes[liftType.workoutTypeKey] : null;
+            let completed = false;
+            if(liftType.workoutTypeKey === 'wta'){
+            }
+            if(!newLiftTypes.get(liftTypeKey).get('lastCompletedDate')){
+                completed = false;
+            } else if(!workoutType || !workoutType.lastCompletedDate){
+                completed = true;
+            }else{
+                completed = newLiftTypes.get(liftTypeKey).get('lastCompletedDate') >= workoutType.lastCompletedDate;
+            }
+            newLiftTypes = newLiftTypes.setIn([liftTypeKey,'completed'],completed);
+        });
+    }
+    
+    return {
+        type:ActionTypeKeys.UPDATE_LIFT_TYPES,
+        liftTypes:newLiftTypes.toJS()
+    }
+}
+
 export interface workoutSummariesReceivedAction {
     type:ActionTypeKeys.WORKOUT_SUMMARIES_RECEIVED;
-    workoutSummaries:{[key:string]:WorkoutSummary}
+    workoutSummaries:{[key:string]:WorkoutSummary};
 }
 
 export function getWorkoutSummariesAsync(){
@@ -127,12 +183,14 @@ export function getWorkoutSummariesAsync(){
         }catch(error){
             console.log('error:',error);
         }
-        if(items)
+        if(items){
             dispatch(workoutSummariesReceived(items));
+            dispatch(updateLiftTypes(state().liftTypes,items,state().workoutTypes,'',''));
+        }
     }
 }
 
-export function workoutSummariesReceived(workoutSummaries:{[key:string]:WorkoutSummary}):workoutSummariesReceivedAction {
+export function workoutSummariesReceived(workoutSummaries:{[key:string]:WorkoutSummary,}):workoutSummariesReceivedAction {
     return {
         type:ActionTypeKeys.WORKOUT_SUMMARIES_RECEIVED,
         workoutSummaries
@@ -327,9 +385,10 @@ export function deleteLiftAsync(liftTypeKey:string){
         const f = new FirebaseService();
         const selectedWorkoutKey = state().selectedWorkout.workout.key;
         dispatch(deleteLift(liftTypeKey,selectedWorkoutKey));
+        dispatch(updateLiftTypes(state().liftTypes,state().workoutSummaries,state().workoutTypes,selectedWorkoutKey,liftTypeKey))
         try{
             let uid = state().user.uid;
-            const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
+            // const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
         }catch(error){
             console.log('error:',error);
         }
@@ -337,7 +396,78 @@ export function deleteLiftAsync(liftTypeKey:string){
     }
 }
 
-export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction|deleteSetAction|deleteLiftAction;
+export interface addLiftAction {
+    type:ActionTypeKeys.ADD_LIFT;
+    lift: Lift;
+    selectedWorkoutKey:string;
+}
+
+export function addLift(liftTypeKey: string, selectedWorkoutKey: string, startDate:Date): addLiftAction {
+    const lift = {
+        liftTypeKey,
+        sets: [],
+        startDate:startDate.getTime(),
+        orderStartDate: -startDate.getTime(),
+        workoutKey:selectedWorkoutKey
+    };
+    return {
+        type:ActionTypeKeys.ADD_LIFT,
+        lift,
+        selectedWorkoutKey
+    }
+}
+
+export function addLiftAsync(liftTypeKey:string,startDate:Date){
+    return async (dispatch:any,state:()=>AppStateModel) => {
+        const f = new FirebaseService();
+        const selectedWorkoutKey = state().selectedWorkout.workout.key;
+        dispatch(addLift(liftTypeKey, selectedWorkoutKey, startDate));
+        console.log('added');
+        dispatch(updateLiftTypes(state().liftTypes,state().workoutSummaries,state().workoutTypes,selectedWorkoutKey,liftTypeKey))
+        try{
+            let uid = state().user.uid;
+            // const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
+        }catch(error){
+            console.log('error:',error);
+        }
+        dispatch(selectedWorkoutUpdated());
+    }
+}
+
+export interface addSetAction {
+    type:ActionTypeKeys.ADD_SET;
+    liftTypeKey: string;
+    setKey: string;
+}
+
+export function addSet(liftTypeKey: string): addSetAction {
+    return {
+        type:ActionTypeKeys.ADD_SET,
+        liftTypeKey,
+        setKey: generatePushID()
+    }
+}
+
+export function addSetAsync(liftTypeKey:string){
+    return async (dispatch: any, state: () => AppStateModel) => {
+        const f = new FirebaseService();
+        let uid = state().user.uid;
+        try{
+            const personalBest = await f.getAsync(`/users/${uid}/best-by-weight/${liftTypeKey}`, undefined, undefined, undefined, 1);
+            console.log('personalBest', personalBest);
+        }catch(error){
+            console.log('error:',error);
+        }
+        dispatch(addSet(liftTypeKey));
+        try{
+            // const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
+        }catch(error){
+            console.log('error:',error);
+        }
+    }
+}
+
+export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction|deleteSetAction|deleteLiftAction|updateLiftTypesAction|addLiftAction|addSetAction;
 
 export interface NavigateAction {
     type:ActionTypeKeys.NAVIGATE;

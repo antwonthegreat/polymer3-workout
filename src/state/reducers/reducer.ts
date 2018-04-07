@@ -7,7 +7,7 @@ import {workoutSummaryReducer as workoutSummaries} from "./workout-summary-reduc
 import {selectedWorkoutReducer as selectedWorkout} from "./selected-workout-reducer";
 
 const reducer:any = combineReducers({
-    navigation,user,workoutTypes,liftTypes,workoutSummaries,selectedWorkout
+    navigation,user,workoutSummaries,workoutTypes,liftTypes,selectedWorkout
 });
 
 export {reducer}

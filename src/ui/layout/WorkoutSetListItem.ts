@@ -1,11 +1,12 @@
 /// <reference path="../../model/WorkoutSet.ts" />
-import {Element as PolymerElement} from "@polymer/polymer/polymer-element";
+import {PolymerElement} from "../../../node_modules/@polymer/polymer/polymer-element";
 import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property-decorator";
 import "../../../node_modules/@polymer/paper-icon-button/paper-icon-button.js";
 import "../../../node_modules/@polymer/iron-iconset-svg/iron-iconset-svg.js";
 import { deleteSet } from "../../state/actions/Actions";
+import WorkoutSet from "../../model/WorkoutSet";
 
-const html = (template:any) => template.toString();
+const html = (template: any) => template.toString();
 
 class WorkoutSetListItem extends PolymerElement {
     @Property()

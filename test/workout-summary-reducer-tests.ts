@@ -2,7 +2,7 @@
 
 import {expect} from 'chai';
 import {reducer} from '../src/state/reducers/reducer.js';
-import {workoutSummariesReceived, deleteLift} from '../src/state/actions/Actions.js';
+import {workoutSummariesReceived, deleteLift, addLift} from '../src/state/actions/Actions.js';
 import {workoutSummaryWithLiftNamesSelector} from '../src/state/reducers/workout-summary-reducer'
 
 describe('workout-summary-reducer', ()=>{
@@ -13,7 +13,7 @@ describe('workout-summary-reducer', ()=>{
             }
         };
 
-        const nextState = reducer(initialState,workoutSummariesReceived({'d':{liftTypeKeys:[''],name:'',orderStartDate:1,startDate:1,id:'1'}}));
+        const nextState = reducer(initialState,workoutSummariesReceived({'d':{liftTypeKeys:[''],name:'',orderStartDate:1,startDate:1,id:'1'}},{}));
         expect(nextState.workoutSummaries.d).to.not.equal(undefined);
         expect(nextState.workoutSummaries.w).to.equal(undefined);
     });
@@ -68,6 +68,35 @@ describe('workout-summary-reducer', ()=>{
         const nextState = reducer(initialState,deleteLift('a','c'));
         expect(nextState.workoutSummaries.w.liftTypeKeys.length).to.equal(2);
         expect(nextState.workoutSummaries.x.liftTypeKeys.length).to.equal(2);
+    });
+
+    it('addLift adds liftTypeKey to selectedWorkout workoutSummary',()=>{
+        const initialState = {
+            workoutSummaries:{
+                'w':{
+                    liftTypeKeys:[
+                        'a',
+                        'b'
+                    ]
+                },
+                'selectedWorkout':{
+                    liftTypeKeys:[
+                        'a',
+                        'b'
+                    ]
+                }
+            },
+            selectedWorkout: {
+                workout: {
+                    key:'selectedWorkout'
+                }
+            }
+        };
+
+        const nextState = reducer(initialState,addLift('liftTypeKey','selectedWorkout',new Date(123)));
+        expect(nextState.workoutSummaries.w.liftTypeKeys.length).to.equal(2);
+        expect(nextState.workoutSummaries.selectedWorkout.liftTypeKeys.length).to.equal(3);
+        expect(nextState.workoutSummaries.selectedWorkout.liftTypeKeys[2]).to.equal('liftTypeKey');
     });
 
     it('workoutSummaryWithLiftNamesSelector returns array with lift names added',()=>{
