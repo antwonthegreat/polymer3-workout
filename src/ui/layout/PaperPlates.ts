@@ -9,6 +9,9 @@ import "../../../node_modules/@polymer/iron-icon/iron-icon.js";
 import "../../../node_modules/@polymer/iron-iconset-svg/iron-iconset-svg.js";
 import Observe from "../../../node_modules/@leavittsoftware/polymer-ts/observe-decorator";
 
+import "../../styles/shared-styles";
+
+
 import "./PlateDrawing";
 import "./DumbbellDrawing";
 
@@ -57,7 +60,7 @@ class PaperPlates extends PolymerElement {
 
     static get template() {
         return html`
-            <style>
+            <style include="shared-styles">
 
             :host {
                 @apply --layout-flex-auto;
