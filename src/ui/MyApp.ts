@@ -64,7 +64,7 @@ class MyApp extends PolymerElement implements ReduxBindable {
         connectToRedux(this);
         
         appState.dispatch(signInIfNeeded());
-        appState.dispatch(navigate('/workout-list'));
+        // appState.dispatch(navigate('/workout-list'));
     }
 
     stateReceiver(state:any) {

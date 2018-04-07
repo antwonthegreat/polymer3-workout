@@ -236,6 +236,8 @@ export function selectWorkoutAsync(id:string){
         const f = new FirebaseService();
         let workout;
         try{
+            let user = await f.signInIfNeeded();
+            dispatch(signedIn(user));
             let uid = state().user.uid;
             workout = (await f.getAsync<Workout>(`/users/${uid}/workouts/`,id))[id];
         }catch(error){
@@ -304,7 +306,7 @@ export function updateSelectedWorkoutSetWeightAsync(weight:number){
         dispatch(updateSelectedWorkoutSetWeight(weight));
         try{
             let uid = state().user.uid;
-            const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
+            // const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
         }catch(error){
             console.log('error:',error);
         }
@@ -330,7 +332,7 @@ export function updateSelectedWorkoutSetRepsAsync(reps:number){
         dispatch(updateSelectedWorkoutSetReps(reps));
         try{
             let uid = state().user.uid;
-            const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
+            // const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
         }catch(error){
             console.log('error:',error);
         }
