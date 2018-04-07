@@ -3,6 +3,10 @@ import {PolymerElement} from "../../../node_modules/@polymer/polymer/polymer-ele
 import {connectToRedux, ReduxBindable} from "../util/ReduxConnector";
 import {workoutSummaryWithLiftNamesSelector} from "../../state/reducers/workout-summary-reducer";
 
+import WorkoutSet from "../../model/WorkoutSet";
+import Workout from "../../model/Workout";
+import AppStateModel from "../../model/AppStateModel";
+
 import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property-decorator";
 import Listen from "../../../node_modules/@leavittsoftware/polymer-ts/listen-decorator";
 import "../layout/WorkoutSummaryListItem";

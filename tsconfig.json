@@ -13,9 +13,6 @@
     "lib": [
       "es2017",
       "dom"
-    ],
-    "typeRoots": [
-      "types"
     ]
   },
   "exclude": [

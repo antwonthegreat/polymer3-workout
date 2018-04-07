@@ -1,7 +1,10 @@
-/// <reference path="../actions/Actions.ts" />
 import {Map, List, fromJS} from 'immutable';
 
 import {ActionTypes,ActionTypeKeys} from '../actions/Actions';
+
+import WorkoutSet from "../../model/WorkoutSet";
+import Workout from "../../model/Workout";
+import AppStateModel from "../../model/AppStateModel";
 
 const initialState = Map({});
 

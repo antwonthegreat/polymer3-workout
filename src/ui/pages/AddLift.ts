@@ -6,6 +6,10 @@ import "../../../node_modules/@polymer/paper-icon-button/paper-icon-button.js";
 import "../../../node_modules/@polymer/iron-iconset-svg/iron-iconset-svg.js";
 import "../../../node_modules/@polymer/paper-button/paper-button.js";
 
+import WorkoutType from "../../model/WorkoutType";
+import LiftType from "../../model/LiftType";
+import AppStateModel from "../../model/AppStateModel";
+
 import {appState} from "../../state/store";
 import {connectToRedux, ReduxBindable} from "../util/ReduxConnector";
 import { activeLiftTypeSelector } from "../../state/reducers/lift-type-reducer";

@@ -3,6 +3,10 @@ import {Map, fromJS} from 'immutable';
 
 import {ActionTypes,ActionTypeKeys} from '../actions/Actions';
 
+import LiftType from "../../model/LiftType";
+import Lift from "../../model/Lift";
+import AppStateModel from "../../model/AppStateModel";
+
 const initialState = Map({});
 
 const liftTypeReducer = (state:any = initialState, action:ActionTypes) => {

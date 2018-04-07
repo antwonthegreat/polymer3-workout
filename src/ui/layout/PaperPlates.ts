@@ -328,8 +328,8 @@ class PaperPlates extends PolymerElement {
                 this.dumbbellSliderIndex = dumbbellSliderIndex;
             }
             this.barbellWeight = parseInt(this.barbellWeight.toString());
-            let barbellPlates = [];
-            let plates = [];
+            let barbellPlates:Array<any> = [];
+            let plates:Array<any> = [];
             let remainingBarbellWeight = weight - this.barbellWeight;
 
             let plateAmountIndex = 0;

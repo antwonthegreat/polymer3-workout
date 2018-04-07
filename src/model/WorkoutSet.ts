@@ -1,4 +1,4 @@
-interface WorkoutSet {
+export default interface WorkoutSet {
     reps:number;
     weight:number;
 

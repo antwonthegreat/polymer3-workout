@@ -4,8 +4,9 @@ import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property
 import "../../../node_modules/@polymer/paper-icon-button/paper-icon-button.js";
 import "../../../node_modules/@polymer/iron-iconset-svg/iron-iconset-svg.js";
 import { deleteSet } from "../../state/actions/Actions";
+import WorkoutSet from "../../model/WorkoutSet";
 
-const html = (template:any) => template.toString();
+const html = (template: any) => template.toString();
 
 class WorkoutSetListItem extends PolymerElement {
     @Property()

@@ -1,7 +1,9 @@
-/// <reference path="../actions/Actions.ts" />
 import {Map, fromJS} from 'immutable';
 
 import {ActionTypes,ActionTypeKeys} from '../actions/Actions';
+
+import AppStateModel from "../../model/AppStateModel";
+
 
 const initialState = Map({});
 

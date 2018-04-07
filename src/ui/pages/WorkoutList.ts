@@ -2,6 +2,7 @@ import {appState} from "../../state/store";
 import {PolymerElement} from "../../../node_modules/@polymer/polymer/polymer-element";
 import {connectToRedux, ReduxBindable} from "../util/ReduxConnector";
 import {workoutSummaryWithLiftNamesSelector} from "../../state/reducers/workout-summary-reducer";
+import WorkoutSummary from "../../model/WorkoutSummary";
 
 import Property from "../../../node_modules/@leavittsoftware/polymer-ts/property-decorator";
 

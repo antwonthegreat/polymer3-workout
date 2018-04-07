@@ -1,4 +1,7 @@
-interface Lift {
+import WorkoutSet from "./WorkoutSet";
+import LiftType from "./LiftType";
+
+export default interface Lift {
     liftTypeKey:string
     sets:Array<WorkoutSet>;
 

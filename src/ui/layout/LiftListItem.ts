@@ -6,6 +6,7 @@ import "../../../node_modules/@polymer/paper-icon-button/paper-icon-button.js";
 import "../../../node_modules/@polymer/iron-iconset-svg/iron-iconset-svg.js";
 import "../../../node_modules/@polymer/paper-button/paper-button.js";
 import "./WorkoutSetListItem";
+import Lift from "../../model/Lift";
 
 const html = (template:any) => template.toString();
 

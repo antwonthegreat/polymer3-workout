@@ -1,9 +1,11 @@
-/// <reference path="../../model/WorkoutType.ts" />
-/// <reference path="../../model/LiftType.ts" />
-/// <reference path="../../model/WorkoutSummary.ts" />
-/// <reference path="../../model/Workout.ts" />
-/// <reference path="../../model/AppStateModel.ts" />
-/// <reference path="../../../node_modules/firebase/index.d.ts" />
+import WorkoutType from "../../model/WorkoutType";
+import LiftType from "../../model/LiftType";
+import Lift from "../../model/Lift";
+import WorkoutSet from "../../model/WorkoutSet";
+import WorkoutSummary from "../../model/WorkoutSummary";
+import Workout from "../../model/Workout";
+import AppStateModel from "../../model/AppStateModel";
+import { User } from "../../../node_modules/firebase/index"
 
 import {FirebaseService} from "../../services/FirebaseService";
 import {Map, fromJS} from 'immutable';
@@ -38,7 +40,7 @@ export interface OtherAction {
 
 export interface SignedInAction {
     type:ActionTypeKeys.SIGNED_IN;
-    user:any;
+    user:User;
 }
 
 export function signInIfNeeded() {
@@ -63,7 +65,7 @@ function signedIn(user:any):SignedInAction {
 export interface workoutTypesReceivedAction {
     type:ActionTypeKeys.WORKOUT_TYPES_RECEIVED;
     workoutTypes:{[key:string]:WorkoutType},
-    user:Partial<firebase.User>
+    user:Partial<User>
 }
 
 export function getWorkoutTypesAsync(){
@@ -80,7 +82,7 @@ export function getWorkoutTypesAsync(){
     }
 }
 
-export function workoutTypesReceived(workoutTypes:{[key:string]:WorkoutType},user:Partial<firebase.User>):workoutTypesReceivedAction {
+export function workoutTypesReceived(workoutTypes:{[key:string]:WorkoutType},user:Partial<User>):workoutTypesReceivedAction {
     return {
         type:ActionTypeKeys.WORKOUT_TYPES_RECEIVED,
         workoutTypes,
@@ -91,7 +93,7 @@ export function workoutTypesReceived(workoutTypes:{[key:string]:WorkoutType},use
 export interface liftTypesReceivedAction {
     type:ActionTypeKeys.LIFT_TYPES_RECEIVED;
     liftTypes:{[key:string]:LiftType},
-    user:Partial<firebase.User>
+    user:Partial<User>
 }
 
 export function getLiftTypesAsync(){
@@ -108,7 +110,7 @@ export function getLiftTypesAsync(){
     }
 }
 
-export function liftTypesReceived(liftTypes:{[key:string]:LiftType},user:Partial<firebase.User>):liftTypesReceivedAction {
+export function liftTypesReceived(liftTypes:{[key:string]:LiftType},user:Partial<User>):liftTypesReceivedAction {
     return {
         type:ActionTypeKeys.LIFT_TYPES_RECEIVED,
         liftTypes,

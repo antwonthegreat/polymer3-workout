@@ -1,6 +1,6 @@
-/// <reference path="./Lift.ts" />
+import Lift from "./Lift";
 
-interface Workout {
+export default interface Workout {
     key:string;
     lifts:Array<Lift>;
     name:string;

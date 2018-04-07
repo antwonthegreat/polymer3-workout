@@ -1,4 +1,4 @@
-interface WorkoutType {
+export default interface WorkoutType {
     users?:{[key:string]:{startDate?:number}};
 
     //computed
