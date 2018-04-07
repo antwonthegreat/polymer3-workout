@@ -251,17 +251,23 @@ class PaperPlates extends PolymerElement {
                 <div name="barbell">
                     <div class="draw-area">
                         <dom-repeat items="[[flippedBarbellPlates]]">
-                            <plate-drawing plate="[[item]]" on-tap="removeBarbellPlate"></plate-drawing>
+                            <template>
+                                <plate-drawing weight="[[item]]" on-tap="removeBarbellPlate"></plate-drawing>
+                            </template>
                         </dom-repeat>
                         <div class="barbell"></div>
-                        <dom-repeat items="[[barbellPlates]]">
-                            <plate-drawing plate="[[item]]" on-tap="removeBarbellPlate"></plate-drawing>
+                        <dom-repeat items="[[barbellPlates]]" restamp>
+                            <template>
+                                <plate-drawing weight="[[item]]" on-tap="removeBarbellPlate"></plate-drawing>
+                            </template>
                         </dom-repeat>
                     </div>
                     <div class="total-weight-area-amount">[[amount]]</div>
                     <div class="plate-amounts">
-                        <dom-repeat items="[[plateAmounts]]">
-                            <paper-button class="plate" on-tap="addBarbellPlate">[[item]]</paper-button>
+                        <dom-repeat items="[[plateAmounts]]" restamp>
+                            <template>
+                                <paper-button class="plate" on-tap="addBarbellPlate">[[item]]</paper-button>
+                            </template>
                         </dom-repeat>
                     </div>
                     <div class="spacer"></div>
@@ -331,8 +337,8 @@ class PaperPlates extends PolymerElement {
                 this.dumbbellSliderIndex = dumbbellSliderIndex;
             }
             this.barbellWeight = parseInt(this.barbellWeight.toString());
-            let barbellPlates:Array<any> = [];
-            let plates:Array<any> = [];
+            let barbellPlates:Array<number> = [];
+            let plates:Array<number> = [];
             let remainingBarbellWeight = weight - this.barbellWeight;
 
             let plateAmountIndex = 0;
@@ -341,7 +347,7 @@ class PaperPlates extends PolymerElement {
                 if (remainingBarbellWeight < plateToAdd * 2) {
                     plateAmountIndex += 1;
                 } else {
-                    barbellPlates.push({ weight: plateToAdd });
+                    barbellPlates.push(plateToAdd);
                     remainingBarbellWeight -= (plateToAdd * 2);
                 }
             }
@@ -355,7 +361,7 @@ class PaperPlates extends PolymerElement {
                 if (remainingWeight < plateToAdd) {
                     plateAmountIndex += 1;
                 } else {
-                    plates.push({ weight: plateToAdd });
+                    plates.push(plateToAdd);
                     remainingWeight -= plateToAdd;
                 }
             }
