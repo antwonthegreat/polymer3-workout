@@ -87,7 +87,7 @@ class EditWorkout extends PolymerElement implements ReduxBindable {
                     <paper-button on-click="_selectLiftToAdd">ADD<paper-button>
                 </main>
                 <add-lift name="add"></add-lift>
-                <paper-plates name="rep" save-amount="[[saveReps]]" cancel="[[cancel]]" amount="[[selectedWorkoutSet.reps]]"  is-reps></paper-plates>
+                <paper-plates name="rep" save-amount="[[saveReps]]" cancel="[[cancel]]" amount="[[selectedWorkoutSet.reps]]" is-reps="true"></paper-plates>
                 <paper-plates name="weight" save-amount="[[saveWeight]]" cancel="[[cancel]]" amount="[[selectedWorkoutSet.weight]]"></paper-plates>
             </iron-pages>
         `

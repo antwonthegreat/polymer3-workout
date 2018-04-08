@@ -53,6 +53,9 @@ class PaperPlates extends PolymerElement {
     maxDumbbellIndex: number;
 
     @Property()
+    dragging: boolean;
+
+    @Property()
     hasChanges: boolean;
 
     @Property()
@@ -281,7 +284,7 @@ class PaperPlates extends PolymerElement {
                         <dumbbell-drawing weight="[[amount]]"></dumbbell-drawing>
                     </div>
                     <paper-slider snaps value="{{dumbbellSliderIndex}}" id="dumbbellSlider" immediate-value="{{dumbbellSliderIndex}}" min="0"
-                        max="[[maxDumbbellIndex]]"></paper-slider>
+                        max="[[maxDumbbellIndex]]" dragging="{{dragging}}"></paper-slider>
                     <div class="spacer"></div>
                     <paper-button class="flat-button-primary" on-tap="okButton">OK</paper-button>
                 </div>
@@ -332,6 +335,46 @@ class PaperPlates extends PolymerElement {
         this.cancel();
     }
 
+    calculateIronPageHeightClass(isReps: boolean) {
+        return isReps ? 'reduced-iron-page-height' : '';
+    }
+
+    @Observe('isReps')
+    isRepsChanged(isReps:boolean) {
+        if (isReps) {
+            this.entryType = 'manual';
+        }
+    }
+
+    @Observe('entryType')
+    entryTypeChanged(entryType:string) {
+        if (entryType === 'dumbbell') {
+            let index = this.dumbbellAmounts.indexOf(this.amount);
+            if (index !== -1) {
+                this.dumbbellSliderIndex;
+            }
+        }
+    }
+
+
+    @Observe('dumbbellAmounts.length')
+    dumbellAmountsLengthChanged(length:number) {
+        if (length) {
+            this.maxDumbbellIndex = length - 1;
+        }
+    }
+
+    @Observe('dumbbellSliderIndex')
+    dumbbellSliderIndexChanged(index:number) {
+        let weight = this.dumbbellAmounts[index];
+        if (weight && this.amount !== weight) {
+            this.amount = weight;
+            if (this.dragging) {
+                this.hasChanges = true;
+            }
+        }
+    }
+
     @Observe('amount')
     weightChanged(weight: number) {
         if (weight) {
@@ -371,6 +414,7 @@ class PaperPlates extends PolymerElement {
             super.set('plates', plates.reverse());
         }
     }
+
 
     addPlate(e:any) {
         let plateAmount: number = e.model.item;
