@@ -29,6 +29,7 @@ export enum ActionTypeKeys {
     DELETE_LIFT = 'DELETE_LIFT',
     ADD_LIFT = 'ADD_LIFT',
     ADD_SET = 'ADD_SET',
+    CLEAR_SELECTED_LIFT = 'CLEAR_SELECTED_LIFT',
 
     SIGNED_IN = 'SIGNED_IN',
     OTHER_ACTION = '__any_other_action_type__'
@@ -304,7 +305,7 @@ export function updateSelectedWorkoutSetWeightAsync(weight:number){
         dispatch(updateSelectedWorkoutSetWeight(weight));
         try{
             let uid = state().user.uid;
-            const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
+            // const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
         }catch(error){
             console.log('error:',error);
         }
@@ -330,7 +331,7 @@ export function updateSelectedWorkoutSetRepsAsync(reps:number){
         dispatch(updateSelectedWorkoutSetReps(reps));
         try{
             let uid = state().user.uid;
-            const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
+            // const g = await f.patchAsync(`/users/${uid}/workouts`,state().selectedWorkout.workout.key,state().selectedWorkout.workout);
         }catch(error){
             console.log('error:',error);
         }
@@ -467,7 +468,18 @@ export function addSetAsync(liftTypeKey:string){
     }
 }
 
-export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction|deleteSetAction|deleteLiftAction|updateLiftTypesAction|addLiftAction|addSetAction;
+export interface ClearSelectLiftAction {
+    type:ActionTypeKeys.CLEAR_SELECTED_LIFT;
+}
+
+
+export function clearSelectedLift():ClearSelectLiftAction {
+    return {
+        type:ActionTypeKeys.CLEAR_SELECTED_LIFT
+    }
+}
+
+export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction|deleteSetAction|deleteLiftAction|updateLiftTypesAction|addLiftAction|addSetAction|ClearSelectLiftAction;
 
 export interface NavigateAction {
     type:ActionTypeKeys.NAVIGATE;
