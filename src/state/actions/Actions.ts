@@ -237,6 +237,8 @@ export function selectWorkoutAsync(id:string){
         const f = new FirebaseService();
         let workout;
         try{
+            let user = await f.signInIfNeeded();
+            dispatch(signedIn(user));
             let uid = state().user.uid;
             workout = (await f.getAsync<Workout>(`/users/${uid}/workouts/`,id))[id];
         }catch(error){
