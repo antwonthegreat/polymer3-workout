@@ -9,6 +9,9 @@ import "../../../node_modules/@polymer/iron-icon/iron-icon.js";
 import "../../../node_modules/@polymer/iron-iconset-svg/iron-iconset-svg.js";
 import Observe from "../../../node_modules/@leavittsoftware/polymer-ts/observe-decorator";
 
+import "../../styles/shared-styles";
+
+
 import "./PlateDrawing";
 import "./DumbbellDrawing";
 
@@ -50,14 +53,20 @@ class PaperPlates extends PolymerElement {
     maxDumbbellIndex: number;
 
     @Property()
+    dragging: boolean;
+
+    @Property()
     hasChanges: boolean;
 
     @Property()
-    saveAmount:(amount:number)=>{};
+    saveAmount: (amount: number) => {};
+    
+    @Property()
+    cancel: () => {};
 
     static get template() {
         return html`
-            <style>
+            <style include="shared-styles">
 
             :host {
                 @apply --layout-flex-auto;
@@ -248,17 +257,23 @@ class PaperPlates extends PolymerElement {
                 <div name="barbell">
                     <div class="draw-area">
                         <dom-repeat items="[[flippedBarbellPlates]]">
-                            <plate-drawing plate="[[item]]" on-tap="removeBarbellPlate"></plate-drawing>
+                            <template>
+                                <plate-drawing weight="[[item]]" on-tap="removeBarbellPlate"></plate-drawing>
+                            </template>
                         </dom-repeat>
                         <div class="barbell"></div>
-                        <dom-repeat items="[[barbellPlates]]">
-                            <plate-drawing plate="[[item]]" on-tap="removeBarbellPlate"></plate-drawing>
+                        <dom-repeat items="[[barbellPlates]]" restamp>
+                            <template>
+                                <plate-drawing weight="[[item]]" on-tap="removeBarbellPlate"></plate-drawing>
+                            </template>
                         </dom-repeat>
                     </div>
                     <div class="total-weight-area-amount">[[amount]]</div>
                     <div class="plate-amounts">
-                        <dom-repeat items="[[plateAmounts]]">
-                            <paper-button class="plate" on-tap="addBarbellPlate">[[item]]</paper-button>
+                        <dom-repeat items="[[plateAmounts]]" restamp>
+                            <template>
+                                <paper-button class="plate" on-tap="addBarbellPlate">[[item]]</paper-button>
+                            </template>
                         </dom-repeat>
                     </div>
                     <div class="spacer"></div>
@@ -269,7 +284,7 @@ class PaperPlates extends PolymerElement {
                         <dumbbell-drawing weight="[[amount]]"></dumbbell-drawing>
                     </div>
                     <paper-slider snaps value="{{dumbbellSliderIndex}}" id="dumbbellSlider" immediate-value="{{dumbbellSliderIndex}}" min="0"
-                        max="[[maxDumbbellIndex]]"></paper-slider>
+                        max="[[maxDumbbellIndex]]" dragging="{{dragging}}"></paper-slider>
                     <div class="spacer"></div>
                     <paper-button class="flat-button-primary" on-tap="okButton">OK</paper-button>
                 </div>
@@ -317,7 +332,47 @@ class PaperPlates extends PolymerElement {
             this.saveAmount(this.amount);
         }
         this.hasChanges = false;
-        //TODO:exit paper-plates without saving
+        this.cancel();
+    }
+
+    calculateIronPageHeightClass(isReps: boolean) {
+        return isReps ? 'reduced-iron-page-height' : '';
+    }
+
+    @Observe('isReps')
+    isRepsChanged(isReps:boolean) {
+        if (isReps) {
+            this.entryType = 'manual';
+        }
+    }
+
+    @Observe('entryType')
+    entryTypeChanged(entryType:string) {
+        if (entryType === 'dumbbell') {
+            let index = this.dumbbellAmounts.indexOf(this.amount);
+            if (index !== -1) {
+                this.dumbbellSliderIndex;
+            }
+        }
+    }
+
+
+    @Observe('dumbbellAmounts.length')
+    dumbellAmountsLengthChanged(length:number) {
+        if (length) {
+            this.maxDumbbellIndex = length - 1;
+        }
+    }
+
+    @Observe('dumbbellSliderIndex')
+    dumbbellSliderIndexChanged(index:number) {
+        let weight = this.dumbbellAmounts[index];
+        if (weight && this.amount !== weight) {
+            this.amount = weight;
+            if (this.dragging) {
+                this.hasChanges = true;
+            }
+        }
     }
 
     @Observe('amount')
@@ -328,8 +383,8 @@ class PaperPlates extends PolymerElement {
                 this.dumbbellSliderIndex = dumbbellSliderIndex;
             }
             this.barbellWeight = parseInt(this.barbellWeight.toString());
-            let barbellPlates:Array<any> = [];
-            let plates:Array<any> = [];
+            let barbellPlates:Array<number> = [];
+            let plates:Array<number> = [];
             let remainingBarbellWeight = weight - this.barbellWeight;
 
             let plateAmountIndex = 0;
@@ -338,7 +393,7 @@ class PaperPlates extends PolymerElement {
                 if (remainingBarbellWeight < plateToAdd * 2) {
                     plateAmountIndex += 1;
                 } else {
-                    barbellPlates.push({ weight: plateToAdd });
+                    barbellPlates.push(plateToAdd);
                     remainingBarbellWeight -= (plateToAdd * 2);
                 }
             }
@@ -352,13 +407,14 @@ class PaperPlates extends PolymerElement {
                 if (remainingWeight < plateToAdd) {
                     plateAmountIndex += 1;
                 } else {
-                    plates.push({ weight: plateToAdd });
+                    plates.push(plateToAdd);
                     remainingWeight -= plateToAdd;
                 }
             }
             super.set('plates', plates.reverse());
         }
     }
+
 
     addPlate(e:any) {
         let plateAmount: number = e.model.item;

@@ -29,6 +29,7 @@ export enum ActionTypeKeys {
     DELETE_LIFT = 'DELETE_LIFT',
     ADD_LIFT = 'ADD_LIFT',
     ADD_SET = 'ADD_SET',
+    CLEAR_SELECTED_LIFT = 'CLEAR_SELECTED_LIFT',
 
     SIGNED_IN = 'SIGNED_IN',
     OTHER_ACTION = '__any_other_action_type__'
@@ -469,7 +470,18 @@ export function addSetAsync(liftTypeKey:string){
     }
 }
 
-export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction|deleteSetAction|deleteLiftAction|updateLiftTypesAction|addLiftAction|addSetAction;
+export interface ClearSelectLiftAction {
+    type:ActionTypeKeys.CLEAR_SELECTED_LIFT;
+}
+
+
+export function clearSelectedLift():ClearSelectLiftAction {
+    return {
+        type:ActionTypeKeys.CLEAR_SELECTED_LIFT
+    }
+}
+
+export type ActionTypes = NavigateAction|SignedInAction|workoutTypesReceivedAction|liftTypesReceivedAction|workoutSummariesReceivedAction|WorkoutReceivedAction|ClearSelectedWorkoutAction|SelectWeightAction|SelectRepAction|SelectedWorkoutUpdatedAction|updateSelectedWorkoutSetWeightAction|updateSelectedWorkoutSetRepsAction|deleteSetAction|deleteLiftAction|updateLiftTypesAction|addLiftAction|addSetAction|ClearSelectLiftAction;
 
 export interface NavigateAction {
     type:ActionTypeKeys.NAVIGATE;

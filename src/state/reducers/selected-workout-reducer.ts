@@ -22,6 +22,9 @@ const selectedWorkoutReducer = (state:AppStateModel['selectedWorkout'] = initial
         case ActionTypeKeys.SELECT_REP: {
             return fromJS(state).set('editMode','rep').set('liftTypeKey',action.liftTypeKey).set('workoutSet',action.workoutSet).toJS();
         }
+        case ActionTypeKeys.CLEAR_SELECTED_LIFT: {
+            return fromJS(state).set('editMode','main').delete('liftTypeKey').delete('workoutSet').toJS();
+        }
         case ActionTypeKeys.UPDATE_SELECTED_WORKOUTSET_WEIGHT: {
             const lift = state.workout.lifts.filter(lift => lift.liftTypeKey === state.liftTypeKey)[0];
             if(!lift)
@@ -34,7 +37,7 @@ const selectedWorkoutReducer = (state:AppStateModel['selectedWorkout'] = initial
                 return state;
 
             const workoutSetIndex = lift.sets.indexOf(workoutSet);
-            return fromJS(state).setIn(['workout','lifts',liftIndex,'sets',workoutSetIndex,'weight'],action.weight).set('editMode',null).toJS();
+            return fromJS(state).setIn(['workout','lifts',liftIndex,'sets',workoutSetIndex,'weight'],action.weight).set('editMode','main').toJS();
         }
         case ActionTypeKeys.UPDATE_SELECTED_WORKOUTSET_REPS: {
             const lift = state.workout.lifts.filter(lift => lift.liftTypeKey === state.liftTypeKey)[0];
@@ -48,7 +51,7 @@ const selectedWorkoutReducer = (state:AppStateModel['selectedWorkout'] = initial
                 return state;
 
             const workoutSetIndex = lift.sets.indexOf(workoutSet);
-            return fromJS(state).setIn(['workout','lifts',liftIndex,'sets',workoutSetIndex,'reps'],action.reps).set('editMode',null).toJS();
+            return fromJS(state).setIn(['workout','lifts',liftIndex,'sets',workoutSetIndex,'reps'],action.reps).set('editMode','main').toJS();
         }
         case ActionTypeKeys.DELETE_SET: {
             const lift = state.workout.lifts.filter(lift => lift.liftTypeKey === action.liftTypeKey)[0];
